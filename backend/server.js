@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
-
+const path = require("path");
 dotenv.config();
 connectDB();
 
@@ -30,6 +30,14 @@ global.io = io;
 
 io.on("connection", (socket) => {
   console.log("User connected");
+});
+
+
+// Serve frontend build files
+app.use(express.static(path.join(__dirname, "dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 server.listen(PORT, () => {

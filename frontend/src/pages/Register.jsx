@@ -455,7 +455,7 @@ const Register = () => {
           variants={item}
           className="text-center text-white/30 text-xs mt-6 flex items-center justify-center gap-1"
         >
-          <span>©</span> 2024 Student Portal. All rights reserved.
+          <span>©</span> All rights reserved for MU, section-A.
         </Motion.p>
       </Motion.div>
     </div>

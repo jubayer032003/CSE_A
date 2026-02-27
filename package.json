@@ -1,5 +1,4 @@
-{
-  "dependencies": {
-    "firebase": "^12.9.0"
-  }
+"scripts": {
+  "start": "node server.js",
+  "build": "cd frontend && npm install && npm run build"
 }
