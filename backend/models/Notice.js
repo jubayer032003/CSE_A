@@ -6,7 +6,7 @@ const noticeSchema = mongoose.Schema(
     content: { type: String, required: true }, // markdown supported
     category: {
       type: String,
-      enum: ["general", "exam", "holiday", "class", "urgent"],
+      enum: ["general", "exam", "event", "holiday", "class", "urgent"],
       default: "general",
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
