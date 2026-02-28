@@ -60,10 +60,10 @@ const Register = () => {
     try {
       setLoading(true);
 
-      const { data } = await axios.post(
-        "/api/auth/register",
-        { ...form, xxx: cleanedXxx }
-      );
+      const { data } = await axios.post("/api/auth/register", {
+        ...form,
+        xxx: cleanedXxx,
+      });
 
       login({ ...data.user, token: data.token });
 
@@ -78,7 +78,10 @@ const Register = () => {
         }
       }, 1800);
     } catch (error) {
-      showToast(error.response?.data?.message || "Registration failed", "error");
+      showToast(
+        error.response?.data?.message || "Registration failed",
+        "error",
+      );
     } finally {
       setLoading(false);
     }
@@ -110,36 +113,40 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0f1e] via-[#0f172a] to-[#1a1f35] relative overflow-hidden p-3 sm:p-4">
-      
       {/* Animated Particles Background - Responsive */}
       <div className="absolute inset-0 z-0">
-        {[...Array(30)].map((_, i) => ( // Reduced number on mobile for performance
-          <Motion.span
-            key={i}
-            className="absolute w-1 sm:w-1.5 h-1 sm:h-1.5 bg-gradient-to-r from-indigo-400/30 to-purple-400/30 rounded-full"
-            animate={{
-              y: ["0%", "100%"],
-              x: [null, Math.random() * 50 - 25],
-              opacity: [0, 0.8, 0],
-            }}
-            transition={{
-              duration: Math.random() * 8 + 5,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "linear",
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `-${Math.random() * 20}%`,
-            }}
-          />
-        ))}
+        {[...Array(30)].map(
+          (
+            _,
+            i, // Reduced number on mobile for performance
+          ) => (
+            <Motion.span
+              key={i}
+              className="absolute w-1 sm:w-1.5 h-1 sm:h-1.5 bg-gradient-to-r from-indigo-400/30 to-purple-400/30 rounded-full"
+              animate={{
+                y: ["0%", "100%"],
+                x: [null, Math.random() * 50 - 25],
+                opacity: [0, 0.8, 0],
+              }}
+              transition={{
+                duration: Math.random() * 8 + 5,
+                repeat: Infinity,
+                delay: Math.random() * 5,
+                ease: "linear",
+              }}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `-${Math.random() * 20}%`,
+              }}
+            />
+          ),
+        )}
       </div>
 
       {/* Animated Gradient Orbs - Responsive sizing */}
       <Motion.div
-        animate={{ 
-          scale: [1, 1.5, 1.2, 1.8, 1], 
+        animate={{
+          scale: [1, 1.5, 1.2, 1.8, 1],
           rotate: [0, 90, 180, 270, 360],
           x: [0, 50, -30, 20, 0],
           y: [0, -30, 50, -20, 0],
@@ -148,8 +155,8 @@ const Register = () => {
         className="absolute top-0 -left-10 sm:-left-20 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-purple-600/20 rounded-full blur-2xl sm:blur-3xl"
       />
       <Motion.div
-        animate={{ 
-          scale: [1, 1.3, 1.5, 1.2, 1], 
+        animate={{
+          scale: [1, 1.3, 1.5, 1.2, 1],
           rotate: [0, -90, -180, -270, -360],
           x: [0, -50, 30, -20, 0],
           y: [0, 30, -50, 20, 0],
@@ -172,12 +179,32 @@ const Register = () => {
             }`}
           >
             {toast.type === "success" ? (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             ) : (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             )}
             <span className="flex-1">{toast.message}</span>
@@ -194,26 +221,31 @@ const Register = () => {
             exit={{ scale: 0 }}
             className="fixed inset-0 flex items-center justify-center z-40 pointer-events-none"
           >
-            {[...Array(20)].map((_, i) => ( // Reduced number on mobile
-              <Motion.div
-                key={i}
-                initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
-                animate={{
-                  x: Math.random() * 400 - 200,
-                  y: Math.random() * 400 - 200,
-                  opacity: 0,
-                  scale: Math.random() * 2 + 1,
-                  rotate: Math.random() * 360,
-                }}
-                transition={{ duration: 1.2, ease: "easeOut" }}
-                className={`absolute w-3 h-3 sm:w-4 sm:h-4 ${
-                  i % 2 === 0 ? "bg-green-400" : "bg-emerald-400"
-                } rounded-full shadow-lg shadow-green-500/50`}
-                style={{
-                  filter: "blur(0.5px)",
-                }}
-              />
-            ))}
+            {[...Array(20)].map(
+              (
+                _,
+                i, // Reduced number on mobile
+              ) => (
+                <Motion.div
+                  key={i}
+                  initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
+                  animate={{
+                    x: Math.random() * 400 - 200,
+                    y: Math.random() * 400 - 200,
+                    opacity: 0,
+                    scale: Math.random() * 2 + 1,
+                    rotate: Math.random() * 360,
+                  }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  className={`absolute w-3 h-3 sm:w-4 sm:h-4 ${
+                    i % 2 === 0 ? "bg-green-400" : "bg-emerald-400"
+                  } rounded-full shadow-lg shadow-green-500/50`}
+                  style={{
+                    filter: "blur(0.5px)",
+                  }}
+                />
+              ),
+            )}
           </Motion.div>
         )}
       </AnimatePresence>
@@ -232,12 +264,25 @@ const Register = () => {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
           <div className="absolute -top-20 -right-20 w-32 sm:w-40 h-32 sm:h-40 bg-purple-500/20 blur-2xl sm:blur-3xl rounded-full"></div>
           <div className="absolute -bottom-20 -left-20 w-32 sm:w-40 h-32 sm:h-40 bg-indigo-500/20 blur-2xl sm:blur-3xl rounded-full"></div>
-          
+
           {/* Header - Responsive */}
-          <Motion.div variants={item} className="text-center mb-6 sm:mb-8 relative">
+          <Motion.div
+            variants={item}
+            className="text-center mb-6 sm:mb-8 relative"
+          >
             <div className="inline-block p-2 sm:p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 border border-white/10">
-              <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              <svg
+                className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-indigo-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                />
               </svg>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -248,8 +293,10 @@ const Register = () => {
             </p>
           </Motion.div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6 relative">
-
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4 sm:space-y-5 md:space-y-6 relative"
+          >
             {/* Floating Input - Name */}
             <Motion.div variants={item} className="relative group">
               <input
@@ -264,8 +311,18 @@ const Register = () => {
                 Full Name
               </label>
               <div className="absolute right-2 sm:right-3 top-3 sm:top-4 text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  className="w-3 h-3 sm:w-4 sm:h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
               </div>
             </Motion.div>
@@ -284,8 +341,18 @@ const Register = () => {
                 Email Address
               </label>
               <div className="absolute right-2 sm:right-3 top-3 sm:top-4 text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-3 h-3 sm:w-4 sm:h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
             </Motion.div>
@@ -310,7 +377,7 @@ const Register = () => {
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
-              
+
               {/* Password Strength Meter */}
               {form.password && (
                 <div className="absolute -bottom-4 sm:-bottom-5 left-0 right-0">
@@ -332,7 +399,9 @@ const Register = () => {
 
             {/* Role Selection with Icons - Responsive */}
             <Motion.div variants={item}>
-              <label className="text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2 block">I want to register as</label>
+              <label className="text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2 block">
+                I want to register as
+              </label>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   type="button"
@@ -343,8 +412,18 @@ const Register = () => {
                       : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
                   }`}
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
                   </svg>
                   <span>Student</span>
                 </button>
@@ -355,10 +434,21 @@ const Register = () => {
                     form.role === "cr"
                       ? "border-purple-500 bg-purple-500/20 text-purple-300"
                       : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
-                  }`}
+                  } ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+                  disabled={loading}
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
                   </svg>
                   <span>CR</span>
                 </button>
@@ -368,8 +458,18 @@ const Register = () => {
             {/* Student ID with Enhanced Design - Responsive */}
             <Motion.div variants={item}>
               <label className="text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2 flex items-center gap-1 sm:gap-2">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                <svg
+                  className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+                  />
                 </svg>
                 Student ID
               </label>
@@ -393,8 +493,18 @@ const Register = () => {
                 />
               </div>
               <p className="text-[10px] sm:text-xs text-white/40 mt-1.5 sm:mt-2 flex items-center gap-1">
-                <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>Enter the last 3 digits of your student ID</span>
               </p>
@@ -411,20 +521,34 @@ const Register = () => {
             >
               {/* Button Shine Effect */}
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-              
+
               {loading ? (
                 <>
                   <Motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1,
+                      ease: "linear",
+                    }}
                     className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full"
                   />
                   <span>Creating Account...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                    />
                   </svg>
                   <span>Create Account</span>
                 </>
@@ -441,8 +565,18 @@ const Register = () => {
                 className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors flex items-center gap-1 group"
               >
                 Sign In
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                <svg
+                  className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
                 </svg>
               </Link>
             </p>
