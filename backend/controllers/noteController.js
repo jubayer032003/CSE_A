@@ -8,7 +8,7 @@ exports.getNotes = async (req, res) => {
 
 // Add note (CR only)
 exports.addNote = async (req, res) => {
-  if (req.user.role !== "cr") {
+  if (!req.user || req.user.role !== "cr") {
     return res.status(403).json({ message: "Only CR can add notes" });
   }
 
@@ -32,7 +32,7 @@ exports.addNote = async (req, res) => {
 
 // Update note
 exports.updateNote = async (req, res) => {
-  if (req.user.role !== "cr") {
+  if (!req.user || req.user.role !== "cr") {
     return res.status(403).json({ message: "Only CR can edit notes" });
   }
 
@@ -49,7 +49,7 @@ exports.updateNote = async (req, res) => {
 
 // Delete note
 exports.deleteNote = async (req, res) => {
-  if (req.user.role !== "cr") {
+  if (!req.user || req.user.role !== "cr") {
     return res.status(403).json({ message: "Only CR can delete notes" });
   }
 

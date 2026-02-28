@@ -8,7 +8,7 @@ exports.getRoutine = async (req, res) => {
 
 // Add new class (CR only)
 exports.addRoutine = async (req, res) => {
-  if (req.user.role !== "cr") {
+  if (!req.user || req.user.role !== "cr") {
     return res.status(403).json({ message: "Only CR can add routine" });
   }
 
@@ -18,7 +18,7 @@ exports.addRoutine = async (req, res) => {
 
 // Update routine (CR only)
 exports.updateRoutine = async (req, res) => {
-  if (req.user.role !== "cr") {
+  if (!req.user || req.user.role !== "cr") {
     return res.status(403).json({ message: "Only CR can edit routine" });
   }
 
@@ -33,7 +33,7 @@ exports.updateRoutine = async (req, res) => {
 
 // Delete routine (CR only)
 exports.deleteRoutine = async (req, res) => {
-  if (req.user.role !== "cr") {
+  if (!req.user || req.user.role !== "cr") {
     return res.status(403).json({ message: "Only CR can delete routine" });
   }
 

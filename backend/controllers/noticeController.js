@@ -8,7 +8,7 @@ exports.getNotices = async (req, res) => {
 
 // Add notice (CR/Admin only)
 exports.addNotice = async (req, res) => {
-  if (req.user.role !== "cr" && req.user.role !== "admin") {
+  if (!req.user || (req.user.role !== "cr" && req.user.role !== "admin")) {
     return res.status(403).json({ message: "Not allowed" });
   }
 
@@ -31,7 +31,7 @@ exports.addNotice = async (req, res) => {
 
 // Update notice (CR/Admin only)
 exports.updateNotice = async (req, res) => {
-  if (req.user.role !== "cr" && req.user.role !== "admin") {
+  if (!req.user || (req.user.role !== "cr" && req.user.role !== "admin")) {
     return res.status(403).json({ message: "Not allowed" });
   }
 
@@ -52,7 +52,7 @@ exports.updateNotice = async (req, res) => {
 
 // Delete notice (CR/Admin only)
 exports.deleteNotice = async (req, res) => {
-  if (req.user.role !== "cr" && req.user.role !== "admin") {
+  if (!req.user || (req.user.role !== "cr" && req.user.role !== "admin")) {
     return res.status(403).json({ message: "Not allowed" });
   }
 
