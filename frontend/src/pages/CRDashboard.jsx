@@ -3,7 +3,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import ReactMarkdown from "react-markdown";
 import socket from "../socket";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 
 const CRDashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -40,7 +40,7 @@ const CRDashboard = () => {
   // ===== ROUTINE =====
   const fetchRoutine = async () => {
     try {
-      const { data } = await axios.get("/api/routine", {
+      const { data } = await axios.get("http://localhost:5000/api/routine", {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setRoutine(data);
@@ -51,7 +51,7 @@ const CRDashboard = () => {
 
   const addClass = async () => {
     try {
-      await axios.post("/api/routine", newClass, {
+      await axios.post("http://localhost:5000/api/routine", newClass, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
 
@@ -64,7 +64,7 @@ const CRDashboard = () => {
 
   const updateClass = async (id, updated) => {
     try {
-      await axios.put(`/api/routine/${id}`, updated, {
+      await axios.put(`http://localhost:5000/api/routine/${id}`, updated, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       fetchRoutine();
@@ -75,7 +75,7 @@ const CRDashboard = () => {
 
   const deleteClass = async (id) => {
     try {
-      await axios.delete(`/api/routine/${id}`, {
+      await axios.delete(`http://localhost:5000/api/routine/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       fetchRoutine();
@@ -87,7 +87,7 @@ const CRDashboard = () => {
   // ===== NOTICES =====
   const fetchNotices = useCallback(async () => {
     try {
-      const { data } = await axios.get("/api/notices");
+      const { data } = await axios.get("http://localhost:5000/api/notices");
       setNotices(data);
     } catch (error) {
       console.error("Error fetching notices:", error);
@@ -96,7 +96,7 @@ const CRDashboard = () => {
 
   const addNotice = async () => {
     try {
-      await axios.post("/api/notices", noticeForm, {
+      await axios.post("http://localhost:5000/api/notices", noticeForm, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
 
@@ -110,7 +110,7 @@ const CRDashboard = () => {
 
   const deleteNotice = async (id) => {
     try {
-      await axios.delete(`/api/notices/${id}`, {
+      await axios.delete(`http://localhost:5000/api/notices/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setDeleteConfirm(null);
@@ -124,7 +124,7 @@ const CRDashboard = () => {
   // ===== NOTES =====
   const fetchNotes = useCallback(async () => {
     try {
-      const { data } = await axios.get("/api/notes");
+      const { data } = await axios.get("http://localhost:5000/api/notes");
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
@@ -146,14 +146,14 @@ const CRDashboard = () => {
     try {
       if (editId) {
         await axios.put(
-          `/api/notes/${editId}`,
+          `http://localhost:5000/api/notes/${editId}`,
           form,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
         setEditId(null);
       } else {
         await axios.post(
-          "/api/notes",
+          "http://localhost:5000/api/notes",
           form,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
@@ -176,7 +176,7 @@ const CRDashboard = () => {
   const deleteHandler = async (id) => {
     try {
       await axios.delete(
-        `/api/notes/${id}`,
+        `http://localhost:5000/api/notes/${id}`,
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       fetchNotes();
@@ -204,11 +204,11 @@ const CRDashboard = () => {
     const fetchInitialData = async () => {
       try {
         const [routineData, noticesData, notesData] = await Promise.all([
-          axios.get("/api/routine", {
+          axios.get("http://localhost:5000/api/routine", {
             headers: { Authorization: `Bearer ${user?.token}` },
           }),
-          axios.get("/api/notices"),
-          axios.get("/api/notes")
+          axios.get("http://localhost:5000/api/notices"),
+          axios.get("http://localhost:5000/api/notes")
         ]);
 
         if (isMounted) {
@@ -259,7 +259,7 @@ const CRDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
-      <motion.div 
+      <Motion.div 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
@@ -267,7 +267,7 @@ const CRDashboard = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
@@ -277,9 +277,9 @@ const CRDashboard = () => {
                 CSE 65th Batch - A Section
               </h1>
               <p className="text-purple-300 text-sm mt-1">CR Control Panel</p>
-            </motion.div>
+            </Motion.div>
             
-            <motion.button
+            <Motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={logout}
@@ -289,7 +289,7 @@ const CRDashboard = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               Logout
-            </motion.button>
+            </Motion.button>
           </div>
 
           {/* Tab Navigation */}
@@ -299,7 +299,7 @@ const CRDashboard = () => {
               { id: "notices", label: "Notices", icon: "📢" },
               { id: "notes", label: "Notes", icon: "📚" },
             ].map((tab) => (
-              <motion.button
+              <Motion.button
                 key={tab.id}
                 variants={tabVariants}
                 animate={activeTab === tab.id ? "active" : "inactive"}
@@ -314,23 +314,23 @@ const CRDashboard = () => {
               >
                 <span>{tab.icon}</span>
                 {tab.label}
-              </motion.button>
+              </Motion.button>
             ))}
           </div>
         </div>
-      </motion.div>
+      </Motion.div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ===== ROUTINE SECTION ===== */}
         <div className={activeTab === "routine" ? "block" : "hidden"}>
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <motion.div variants={itemVariants} initial="hidden" animate="visible" className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+            <Motion.div variants={itemVariants} initial="hidden" animate="visible" className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
               <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <span className="text-2xl">📅</span> Routine Manager
               </h3>
@@ -348,14 +348,14 @@ const CRDashboard = () => {
                     }
                   />
                 ))}
-                <motion.button
+                <Motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={addClass}
                   className="px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-600/30"
                 >
                   Add Class
-                </motion.button>
+                </Motion.button>
               </div>
 
               {/* Routine Table */}
@@ -438,22 +438,22 @@ const CRDashboard = () => {
                         </td>
                         <td className="p-3">
                           <div className="flex gap-2">
-                            <motion.button
+                            <Motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => updateClass(r._id, r)}
                               className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                             >
                               Save
-                            </motion.button>
-                            <motion.button
+                            </Motion.button>
+                            <Motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => deleteClass(r._id)}
                               className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
                             >
                               Delete
-                            </motion.button>
+                            </Motion.button>
                           </div>
                         </td>
                       </tr>
@@ -461,31 +461,31 @@ const CRDashboard = () => {
                   </tbody>
                 </table>
               </div>
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
         </div>
 
         {/* ===== NOTICES SECTION ===== */}
         <div className={activeTab === "notices" ? "block" : "hidden"}>
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <motion.div variants={itemVariants} initial="hidden" animate="visible" className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+            <Motion.div variants={itemVariants} initial="hidden" animate="visible" className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                   <span className="text-2xl">📢</span> Notice Manager
                 </h3>
-                <motion.button
+                <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setNoticeModal(true)}
                   className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-600/30"
                 >
                   + Add Notice
-                </motion.button>
+                </Motion.button>
               </div>
 
               {/* Notice List - Fixed Delete Button */}
@@ -494,7 +494,7 @@ const CRDashboard = () => {
                   const categoryStyle = categories[notice.category] || categories.general;
                   
                   return (
-                    <motion.div
+                    <Motion.div
                       key={notice._id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -534,7 +534,7 @@ const CRDashboard = () => {
                           {/* Delete Button with Confirmation */}
                           {deleteConfirm === notice._id ? (
                             <div className="flex gap-2 bg-white/10 p-1 rounded-lg">
-                              <motion.button
+                              <Motion.button
                                 initial={{ scale: 0.9 }}
                                 animate={{ scale: 1 }}
                                 onClick={() => deleteNotice(notice._id)}
@@ -545,8 +545,8 @@ const CRDashboard = () => {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 Yes
-                              </motion.button>
-                              <motion.button
+                              </Motion.button>
+                              <Motion.button
                                 initial={{ scale: 0.9 }}
                                 animate={{ scale: 1 }}
                                 onClick={() => setDeleteConfirm(null)}
@@ -557,10 +557,10 @@ const CRDashboard = () => {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                                 No
-                              </motion.button>
+                              </Motion.button>
                             </div>
                           ) : (
-                            <motion.button
+                            <Motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => setDeleteConfirm(notice._id)}
@@ -570,11 +570,11 @@ const CRDashboard = () => {
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
-                            </motion.button>
+                            </Motion.button>
                           )}
                         </div>
                       </div>
-                    </motion.div>
+                    </Motion.div>
                   );
                 })}
 
@@ -584,19 +584,19 @@ const CRDashboard = () => {
                   </div>
                 )}
               </div>
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
         </div>
 
         {/* ===== NOTES SECTION ===== */}
         <div className={activeTab === "notes" ? "block" : "hidden"}>
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <motion.div variants={itemVariants} initial="hidden" animate="visible" className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+            <Motion.div variants={itemVariants} initial="hidden" animate="visible" className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
               <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
                 <span className="text-2xl">📚</span> Note Management
               </h3>
@@ -654,17 +654,17 @@ const CRDashboard = () => {
                 </div>
 
                 <div className="flex gap-3 mt-4">
-                  <motion.button
+                  <Motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={submitHandler}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-600/30"
                   >
                     {editId ? "Update Note" : "Add Note"}
-                  </motion.button>
+                  </Motion.button>
                   
                   {editId && (
-                    <motion.button
+                    <Motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
@@ -680,7 +680,7 @@ const CRDashboard = () => {
                       className="px-6 py-2 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all duration-300"
                     >
                       Cancel
-                    </motion.button>
+                    </Motion.button>
                   )}
                 </div>
               </div>
@@ -722,22 +722,22 @@ const CRDashboard = () => {
                         </td>
                         <td className="p-3">
                           <div className="flex gap-3">
-                            <motion.button
+                            <Motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => editHandler(n)}
                               className="text-blue-400 hover:text-blue-300 transition-colors"
                             >
                               Edit
-                            </motion.button>
-                            <motion.button
+                            </Motion.button>
+                            <Motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => deleteHandler(n._id)}
                               className="text-red-400 hover:text-red-300 transition-colors"
                             >
                               Delete
-                            </motion.button>
+                            </Motion.button>
                           </div>
                         </td>
                       </tr>
@@ -745,22 +745,22 @@ const CRDashboard = () => {
                   </tbody>
                 </table>
               </div>
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
         </div>
       </div>
 
       {/* Notice Modal */}
       <AnimatePresence>
         {noticeModal && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
             onClick={() => setNoticeModal(false)}
           >
-            <motion.div
+            <Motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -798,25 +798,25 @@ const CRDashboard = () => {
               />
               
               <div className="flex justify-end gap-3">
-                <motion.button
+                <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setNoticeModal(false)}
                   className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-300"
                 >
                   Cancel
-                </motion.button>
-                <motion.button
+                </Motion.button>
+                <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={addNotice}
                   className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-600/30"
                 >
                   Add Notice
-                </motion.button>
+                </Motion.button>
               </div>
-            </motion.div>
-          </motion.div>
+            </Motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>

@@ -3,7 +3,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import ReactMarkdown from "react-markdown";
 import socket from "../socket";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 const StudentDashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -197,7 +197,7 @@ const StudentDashboard = () => {
         .toUpperCase();
 
       return (
-        <motion.div
+        <Motion.div
           key={cr.id}
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -242,7 +242,7 @@ const StudentDashboard = () => {
 
           {/* Bottom Accent Line */}
           <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-purple-500 group-hover:w-full transition-all duration-500"></div>
-        </motion.div>
+        </Motion.div>
       );
     })}
   </div>
@@ -250,7 +250,7 @@ const StudentDashboard = () => {
 
         {/* Class Routine */}
         <section className="mb-16">
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -269,9 +269,9 @@ const StudentDashboard = () => {
                 Spring 2026
               </span>
             </div>
-          </motion.div>
+          </Motion.div>
 
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -374,7 +374,7 @@ const StudentDashboard = () => {
 
                   <tbody className="divide-y divide-gray-700/50">
                     {routine.map((r, index) => (
-                      <motion.tr
+                      <Motion.tr
                         key={r._id}
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -406,7 +406,7 @@ const StudentDashboard = () => {
                             <span className="text-gray-400">{r.room}</span>
                           </div>
                         </td>
-                      </motion.tr>
+                      </Motion.tr>
                     ))}
 
                     {routine.length === 0 && (
@@ -450,11 +450,11 @@ const StudentDashboard = () => {
                 </div>
               )}
             </div>
-          </motion.div>
+          </Motion.div>
         </section>
         {/* Notice Board */}
         <section className="mb-12">
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -475,11 +475,11 @@ const StudentDashboard = () => {
                 </span>
               </div>
             )}
-          </motion.div>
+          </Motion.div>
 
           <div className="space-y-4">
             {notices.map((n, index) => (
-              <motion.div
+              <Motion.div
                 key={n._id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -640,11 +640,11 @@ const StudentDashboard = () => {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </Motion.div>
             ))}
 
             {notices.length === 0 && (
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -673,13 +673,13 @@ const StudentDashboard = () => {
                     Check back later for updates and announcements
                   </p>
                 </div>
-              </motion.div>
+              </Motion.div>
             )}
           </div>
         </section>
         {/* Notes & Materials */}
         <section>
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -701,10 +701,10 @@ const StudentDashboard = () => {
                 </span>
               </div>
             )}
-          </motion.div>
+          </Motion.div>
 
           {/* Filter Section */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -767,10 +767,10 @@ const StudentDashboard = () => {
                 </svg>
               </div>
             </div>
-          </motion.div>
+          </Motion.div>
 
           {/* Table Section */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -897,7 +897,7 @@ const StudentDashboard = () => {
 
                   <tbody className="divide-y divide-gray-700/50">
                     {filteredNotes.map((n, index) => (
-                      <motion.tr
+                      <Motion.tr
                         key={n._id}
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -973,13 +973,13 @@ const StudentDashboard = () => {
                             </a>
                           </div>
                         </td>
-                      </motion.tr>
+                      </Motion.tr>
                     ))}
 
                     {filteredNotes.length === 0 && (
                       <tr>
                         <td colSpan="5" className="px-6 py-12">
-                          <motion.div
+                          <Motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.4 }}
@@ -1016,7 +1016,7 @@ const StudentDashboard = () => {
                             >
                               Clear Filters
                             </button>
-                          </motion.div>
+                          </Motion.div>
                         </td>
                       </tr>
                     )}
@@ -1048,7 +1048,7 @@ const StudentDashboard = () => {
                 </div>
               )}
             </div>
-          </motion.div>
+          </Motion.div>
         </section>
       </main>
     </div>
@@ -1056,4 +1056,5 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+
 
