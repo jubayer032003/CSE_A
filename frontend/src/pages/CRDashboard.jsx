@@ -40,7 +40,7 @@ const CRDashboard = () => {
   // ===== ROUTINE =====
   const fetchRoutine = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/routine", {
+      const { data } = await axios.get("/api/routine", {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setRoutine(data);
@@ -51,7 +51,7 @@ const CRDashboard = () => {
 
   const addClass = async () => {
     try {
-      await axios.post("http://localhost:5000/api/routine", newClass, {
+      await axios.post("/api/routine", newClass, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
 
@@ -64,7 +64,7 @@ const CRDashboard = () => {
 
   const updateClass = async (id, updated) => {
     try {
-      await axios.put(`http://localhost:5000/api/routine/${id}`, updated, {
+      await axios.put(`/api/routine/${id}`, updated, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       fetchRoutine();
@@ -75,7 +75,7 @@ const CRDashboard = () => {
 
   const deleteClass = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/routine/${id}`, {
+      await axios.delete(`/api/routine/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       fetchRoutine();
@@ -87,7 +87,7 @@ const CRDashboard = () => {
   // ===== NOTICES =====
   const fetchNotices = useCallback(async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/notices");
+      const { data } = await axios.get("/api/notices");
       setNotices(data);
     } catch (error) {
       console.error("Error fetching notices:", error);
@@ -96,7 +96,7 @@ const CRDashboard = () => {
 
   const addNotice = async () => {
     try {
-      await axios.post("http://localhost:5000/api/notices", noticeForm, {
+      await axios.post("/api/notices", noticeForm, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
 
@@ -110,7 +110,7 @@ const CRDashboard = () => {
 
   const deleteNotice = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/notices/${id}`, {
+      await axios.delete(`/api/notices/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setDeleteConfirm(null);
@@ -124,7 +124,7 @@ const CRDashboard = () => {
   // ===== NOTES =====
   const fetchNotes = useCallback(async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/notes");
+      const { data } = await axios.get("/api/notes");
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
@@ -146,14 +146,14 @@ const CRDashboard = () => {
     try {
       if (editId) {
         await axios.put(
-          `http://localhost:5000/api/notes/${editId}`,
+          `/api/notes/${editId}`,
           form,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
         setEditId(null);
       } else {
         await axios.post(
-          "http://localhost:5000/api/notes",
+          "/api/notes",
           form,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
@@ -176,7 +176,7 @@ const CRDashboard = () => {
   const deleteHandler = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/notes/${id}`,
+        `/api/notes/${id}`,
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       fetchNotes();
@@ -204,11 +204,11 @@ const CRDashboard = () => {
     const fetchInitialData = async () => {
       try {
         const [routineData, noticesData, notesData] = await Promise.all([
-          axios.get("http://localhost:5000/api/routine", {
+          axios.get("/api/routine", {
             headers: { Authorization: `Bearer ${user?.token}` },
           }),
-          axios.get("http://localhost:5000/api/notices"),
-          axios.get("http://localhost:5000/api/notes")
+          axios.get("/api/notices"),
+          axios.get("/api/notes")
         ]);
 
         if (isMounted) {

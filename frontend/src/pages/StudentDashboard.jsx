@@ -16,7 +16,7 @@ const StudentDashboard = () => {
 
   const fetchRoutine = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/routine", {
+      const { data } = await axios.get("/api/routine", {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setRoutine(data);
@@ -27,7 +27,7 @@ const StudentDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/notices");
+      const { data } = await axios.get("/api/notices");
       setNotices(data);
     } catch (error) {
       console.error("Error fetching notices:", error);
@@ -36,7 +36,7 @@ const StudentDashboard = () => {
 
   const fetchNotes = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/notes");
+      const { data } = await axios.get("/api/notes");
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
@@ -1056,3 +1056,4 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+

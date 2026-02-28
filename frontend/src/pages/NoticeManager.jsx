@@ -11,13 +11,13 @@ const NoticeManager = () => {
   const [form, setForm] = useState({ title: "", content: "" });
 
   const fetchNotices = async () => {
-    const { data } = await axios.get("http://localhost:5000/api/notices");
+    const { data } = await axios.get("/api/notices");
     setNotices(data);
   };
 
   useEffect(() => {
     const loadNotices = async () => {
-      const { data } = await axios.get("http://localhost:5000/api/notices");
+      const { data } = await axios.get("/api/notices");
       setNotices(data);
     };
     loadNotices();
@@ -38,13 +38,13 @@ const NoticeManager = () => {
   const saveNotice = async () => {
     if (editing) {
       await axios.put(
-        `http://localhost:5000/api/notices/${editing}`,
+        `/api/notices/${editing}`,
         form,
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
     } else {
       await axios.post(
-        "http://localhost:5000/api/notices",
+        "/api/notices",
         form,
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -55,7 +55,7 @@ const NoticeManager = () => {
   };
 
   const deleteNotice = async (id) => {
-    await axios.delete(`http://localhost:5000/api/notices/${id}`, {
+    await axios.delete(`/api/notices/${id}`, {
       headers: { Authorization: `Bearer ${user.token}` },
     });
     fetchNotices();

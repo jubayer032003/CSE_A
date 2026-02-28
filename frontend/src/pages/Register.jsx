@@ -61,7 +61,7 @@ const Register = () => {
       setLoading(true);
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "/api/auth/register",
         { ...form, xxx: cleanedXxx }
       );
 

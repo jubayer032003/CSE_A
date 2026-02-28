@@ -16,7 +16,7 @@ const NoteManager = () => {
   });
 
   const fetchNotes = async () => {
-    const { data } = await axios.get("http://localhost:5000/api/notes");
+    const { data } = await axios.get("/api/notes");
     setNotes(data);
   };
 
@@ -29,7 +29,7 @@ const NoteManager = () => {
   }, []);
 
   const addNote = async () => {
-    await axios.post("http://localhost:5000/api/notes", form, {
+    await axios.post("/api/notes", form, {
       headers: { Authorization: `Bearer ${user.token}` },
     });
 
@@ -37,7 +37,7 @@ const NoteManager = () => {
   };
 
   const deleteNote = async (id) => {
-    await axios.delete(`http://localhost:5000/api/notes/${id}`, {
+    await axios.delete(`/api/notes/${id}`, {
       headers: { Authorization: `Bearer ${user.token}` },
     });
   };
