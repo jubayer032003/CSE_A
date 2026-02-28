@@ -256,252 +256,209 @@ const StudentDashboard = () => {
         </section>
 
         {/* Class Routine */}
-<section className="mb-16">
-  <Motion.div
-    initial={{ opacity: 0, y: -20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    viewport={{ once: true }}
-    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
-  >
-    <div className="relative">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl">
-          <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <div>
-          <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Class Schedule
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">Weekly timetable for Spring 2026</p>
-        </div>
-      </div>
-      <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mt-2 ml-14"></div>
-    </div>
-
-    <div className="flex items-center gap-3 self-start sm:self-auto">
-      <div className="px-4 py-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-lg backdrop-blur-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span className="text-sm font-medium text-indigo-300">
-            Spring 2026
-          </span>
-        </div>
-      </div>
-      
-      {/* Quick stats pill */}
-      <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-        <span className="text-xs text-gray-400">Total:</span>
-        <span className="text-sm font-semibold text-white">{routine.length}</span>
-        <span className="text-xs text-gray-400">classes</span>
-      </div>
-    </div>
-  </Motion.div>
-
-  <Motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }}
-    viewport={{ once: true }}
-    className="relative group"
-  >
-    {/* Animated gradient background */}
-    <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-700 group-hover:duration-300"></div>
-    
-    {/* Main card */}
-    <div className="relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-700/60 shadow-2xl overflow-hidden">
-      
-      {/* Top accent bar with animation */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transform origin-left transition-transform duration-500 scale-x-100"></div>
-      
-      {/* Animated background blobs */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 blur-3xl rounded-full animate-pulse"></div>
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/20 blur-3xl rounded-full animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/5 blur-3xl rounded-full"></div>
-
-      {/* Table header with gradient background */}
-      <div className="relative bg-gradient-to-r from-gray-800/50 to-gray-900/50 px-6 py-3 border-b border-gray-700">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 bg-red-500/80 rounded-full"></div>
-            <div className="w-3 h-3 bg-yellow-500/80 rounded-full"></div>
-            <div className="w-3 h-3 bg-green-500/80 rounded-full"></div>
-          </div>
-          <span className="text-xs text-gray-500 ml-2">class-routine@spring-2026</span>
-        </div>
-      </div>
-
-      {/* Table container with custom scrollbar */}
-      <div className="relative overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800/50">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700/70 bg-gray-800/30">
-              {[
-                { icon: 'calendar', label: 'Day', color: 'text-indigo-400' },
-                { icon: 'clock', label: 'Time', color: 'text-purple-400' },
-                { icon: 'book', label: 'Course', color: 'text-blue-400' },
-                { icon: 'location', label: 'Room', color: 'text-pink-400' }
-              ].map((header, idx) => (
-                <th key={idx} className="px-6 py-4 text-left">
-                  <div className="flex items-center gap-2">
-                    <svg 
-                      className={`w-4 h-4 ${header.color} flex-shrink-0`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      {header.icon === 'calendar' && (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      )}
-                      {header.icon === 'clock' && (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      )}
-                      {header.icon === 'book' && (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      )}
-                      {header.icon === 'location' && (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      )}
-                    </svg>
-                    <span className="font-semibold text-gray-300 tracking-wide uppercase text-xs">
-                      {header.label}
-                    </span>
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-700/50">
-            {routine.map((r, index) => (
-              <Motion.tr
-                key={r._id}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-                className="group/row hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-800/30 transition-all duration-200 cursor-default"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      index % 3 === 0 ? 'bg-indigo-400' : 
-                      index % 3 === 1 ? 'bg-purple-400' : 'bg-pink-400'
-                    }`}></div>
-                    <span className="text-gray-200 font-medium">{r.day}</span>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2.5 py-1 bg-gray-800/80 border border-gray-700 rounded-md text-xs font-mono text-indigo-300">
-                      <svg className="w-3 h-3 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {r.time}
-                    </span>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded flex items-center justify-center text-xs font-bold text-indigo-400">
-                      {r.course.charAt(0)}
-                    </div>
-                    <span className="text-white font-medium">{r.course}</span>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span className="text-gray-300">{r.room}</span>
-                  </div>
-                </td>
-              </Motion.tr>
-            ))}
-
-            {routine.length === 0 && (
-              <tr>
-                <td colSpan="4" className="px-6 py-16">
-                  <Motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex flex-col items-center justify-center text-center"
-                  >
-                    <div className="relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full flex items-center justify-center mb-4 border border-gray-700">
-                        <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-300 mb-1">No Classes Scheduled</h3>
-                    <p className="text-gray-500 text-sm max-w-sm">
-                      The class routine for Spring 2026 hasn't been published yet. Check back later!
-                    </p>
-                  </Motion.div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Footer with additional info */}
-      {routine.length > 0 && (
-        <div className="px-6 py-3 bg-gray-800/50 border-t border-gray-700/60 backdrop-blur-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">Total classes:</span>
-                <span className="text-white font-semibold">{routine.length}</span>
-              </div>
-              <div className="w-px h-4 bg-gray-700 hidden sm:block"></div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">Last updated:</span>
-                <span className="text-indigo-400">Just now</span>
-              </div>
+        <section className="mb-16">
+          <Motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="flex items-center justify-between mb-8"
+          >
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Class Routine
+              </h2>
+              <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mt-2"></div>
             </div>
-            
-            {/* Download button (placeholder - no functionality) */}
-            <button className="flex items-center gap-1.5 px-2 py-1 bg-gray-700/30 rounded hover:bg-gray-700/50 transition-colors text-gray-400 hover:text-indigo-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span className="text-xs">Export</span>
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  </Motion.div>
 
-  {/* Quick legend */}
-  {routine.length > 0 && (
-    <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-      <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-        <span>Morning classes</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-        <span>Afternoon classes</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-        <span>Evening classes</span>
-      </div>
-    </div>
-  )}
-</section>
+            <div className="px-4 py-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-lg">
+              <span className="text-sm font-medium text-indigo-300">
+                Spring 2026
+              </span>
+            </div>
+          </Motion.div>
+
+          <Motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="relative group"
+          >
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-500"></div>
+
+            <div className="relative bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-700/60 shadow-2xl overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-3xl rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/20 blur-3xl rounded-full animate-pulse delay-1000"></div>
+
+              <div className="relative overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-700/70">
+                      <th className="px-6 py-4 text-left">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4 text-indigo-400 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <span className="font-semibold text-gray-300">
+                            Day
+                          </span>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 text-left">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4 text-indigo-400 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <span className="font-semibold text-gray-300">
+                            Time
+                          </span>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 text-left">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4 text-indigo-400 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                            />
+                          </svg>
+                          <span className="font-semibold text-gray-300">
+                            Course
+                          </span>
+                        </div>
+                      </th>
+                      <th className="px-6 py-4 text-left">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4 text-indigo-400 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            />
+                          </svg>
+                          <span className="font-semibold text-gray-300">
+                            Room
+                          </span>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-700/50">
+                    {routine.map((r, index) => (
+                      <Motion.tr
+                        key={r._id}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        viewport={{ once: true }}
+                        className="group/row hover:bg-gray-800/40 transition-colors duration-200"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full flex-shrink-0"></div>
+                            <span className="text-gray-200">{r.day}</span>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span className="inline-flex px-2.5 py-1 bg-gray-800 border border-gray-700 rounded-md text-xs font-mono text-indigo-300">
+                            {r.time}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span className="text-white font-medium">
+                            {r.course}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-400">{r.room}</span>
+                          </div>
+                        </td>
+                      </Motion.tr>
+                    ))}
+
+                    {routine.length === 0 && (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12">
+                          <div className="flex flex-col items-center justify-center text-center">
+                            <div className="w-16 h-16 bg-gray-800/50 rounded-full flex items-center justify-center mb-4 border border-gray-700">
+                              <svg
+                                className="w-8 h-8 text-gray-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                            </div>
+                            <p className="text-gray-400">
+                              No routine available.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {routine.length > 0 && (
+                <div className="px-6 py-3 bg-gray-800/30 border-t border-gray-700/60">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-500">
+                      {routine.length} classes scheduled
+                    </span>
+                    <span className="text-indigo-400">Updated just now</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Motion.div>
+        </section>
         {/* Notice Board */}
         <section className="mb-12">
           <Motion.div
