@@ -434,8 +434,8 @@ const Register = () => {
                     form.role === "cr"
                       ? "border-purple-500 bg-purple-500/20 text-purple-300"
                       : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
-                  } ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
-                  disabled={loading}
+                  } opacity-50 cursor-not-allowed pointer-events-none`}
+                  disabled
                 >
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
