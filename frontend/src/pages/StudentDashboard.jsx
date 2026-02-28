@@ -84,19 +84,6 @@ const StudentDashboard = () => {
     },
   ];
 
-  const container = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -182,239 +169,70 @@ const StudentDashboard = () => {
 </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-       {/* Class Representatives */}
-{/* Class Representatives */}
-<section className="mb-20 relative">
-  {/* Background Decoration */}
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
-    <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-  </div>
+        {/* Class Representatives */}
+<section className="mb-20">
+  <h2 className="text-2xl sm:text-3xl font-bold mb-10 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+    Class Representatives
+  </h2>
 
-  {/* Section Header with Enhanced Animation */}
-  <Motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }}
-    viewport={{ once: true }}
-    className="relative mb-12"
-  >
-    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center">
-      <span className="bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent bg-300% animate-gradient">
-        Class Representatives
-      </span>
-    </h2>
-    
-    {/* Decorative Underline */}
-    <div className="flex justify-center mt-4">
-      <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
-    </div>
-    
-    {/* Subtitle */}
-    <p className="text-center text-gray-400 mt-4 max-w-2xl mx-auto text-sm sm:text-base">
-      Meet your dedicated class representatives working tirelessly to bridge the gap between students and faculty
-    </p>
-  </Motion.div>
-
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 relative z-10">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
     {classReps.map((cr, index) => {
       const initials = cr.name
         .split(" ")
         .map((n) => n[0])
         .join("")
-        .toUpperCase()
-        .slice(0, 2);
-
-      // Generate random gradient for avatar
-      const gradients = [
-        "from-indigo-500 to-purple-600",
-        "from-purple-500 to-pink-600",
-        "from-blue-500 to-indigo-600",
-        "from-pink-500 to-rose-600",
-        "from-emerald-500 to-teal-600",
-        "from-orange-500 to-red-600"
-      ];
-      
-      const avatarGradient = gradients[index % gradients.length];
+        .toUpperCase();
 
       return (
         <Motion.div
           key={cr.id}
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: index * 0.15 }}
-          whileHover={{ y: -8, scale: 1.02 }}
-          viewport={{ once: true, margin: "-50px" }}
-          className="relative group"
+          transition={{ duration: 0.6, delay: index * 0.1 }}
+          whileHover={{ y: -6 }}
+          viewport={{ once: true }}
+          className="relative group bg-gradient-to-br from-gray-900/80 to-gray-800/70
+                     backdrop-blur-xl rounded-3xl p-7
+                     border border-gray-700/60
+                     hover:border-indigo-500/60
+                     shadow-lg hover:shadow-indigo-500/20
+                     transition-all duration-300 overflow-hidden"
         >
-          {/* Animated Border Gradient */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-100 blur transition-all duration-500 group-hover:duration-200"></div>
-          
-          {/* Main Card */}
-          <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 group-hover:border-transparent transition-all duration-300 overflow-hidden">
+          {/* Glow Effect */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full group-hover:bg-indigo-500/20 transition-all duration-500"></div>
+
+          <div className="flex items-center gap-6 relative z-10">
             
-            {/* Animated Background Patterns */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+            {/* Initial Avatar */}
+            <div className="w-20 h-20 flex items-center justify-center 
+                            rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 
+                            text-white text-xl font-bold shadow-lg">
+              {initials}
             </div>
 
-            {/* Floating Particles */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-4 right-4 w-1 h-1 bg-indigo-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-ping"></div>
-              <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-ping animation-delay-300"></div>
-            </div>
+            {/* Info */}
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-white tracking-wide">
+                {cr.name}
+              </h3>
 
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
-              
-              {/* 3D Avatar with Hover Effect */}
-              <Motion.div
-                whileHover={{ rotate: [0, -5, 5, -5, 0], scale: 1.1 }}
-                transition={{ duration: 0.5 }}
-                className="relative"
-              >
-                {/* Avatar Ring */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
-                
-                {/* Avatar */}
-                <div className={`relative w-24 h-24 flex items-center justify-center 
-                                rounded-2xl bg-gradient-to-br ${avatarGradient}
-                                text-white text-2xl font-bold shadow-xl
-                                group-hover:shadow-2xl group-hover:shadow-indigo-500/30
-                                transition-all duration-300 transform group-hover:scale-105
-                                border-2 border-white/10 group-hover:border-white/20`}>
-                  {initials}
-                  
-                  {/* Status Indicator */}
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></div>
-                </div>
-
-                {/* Social Icons Hover Overlay */}
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                  <div className="flex gap-2">
-                    <div className="w-8 h-8 bg-indigo-500/20 backdrop-blur rounded-full flex items-center justify-center hover:bg-indigo-500/40 transition-colors cursor-pointer">
-                      <svg className="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12z"/>
-                      </svg>
-                    </div>
-                    <div className="w-8 h-8 bg-purple-500/20 backdrop-blur rounded-full flex items-center justify-center hover:bg-purple-500/40 transition-colors cursor-pointer">
-                      <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </Motion.div>
-
-              {/* Info Section */}
-              <div className="flex-1 text-center sm:text-left">
-                <h3 className="text-2xl font-bold text-white tracking-wide mb-2
-                               bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  {cr.name}
-                </h3>
-
-                {/* Role Badge */}
-                <div className="inline-block px-3 py-1 mb-4 text-xs font-medium
-                              bg-gradient-to-r from-indigo-500/20 to-purple-500/20 
-                              text-indigo-300 rounded-full border border-indigo-500/30
-                              backdrop-blur-sm">
-                  Class Representative
-                </div>
-
-                {/* Contact Info with Interactive Elements */}
-                <div className="space-y-3 text-sm">
-                  <Motion.div 
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-3 text-gray-400 hover:text-indigo-400 transition-all duration-300 group/item"
-                  >
-                    <div className="p-2 bg-indigo-500/10 rounded-lg group-hover/item:bg-indigo-500/20 transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <span className="flex-1 truncate">{cr.email}</span>
-                    <button className="opacity-0 group-hover/item:opacity-100 transition-opacity">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                      </svg>
-                    </button>
-                  </Motion.div>
-
-                  <Motion.div 
-                    whileHover={{ x: 5 }}
-                    className="flex items-center gap-3 text-gray-400 hover:text-purple-400 transition-all duration-300 group/item"
-                  >
-                    <div className="p-2 bg-purple-500/10 rounded-lg group-hover/item:bg-purple-500/20 transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                    </div>
-                    <span>{cr.phone}</span>
-                  </Motion.div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="flex gap-2 mt-4 justify-center sm:justify-start">
-                  <Motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 
-                               text-white text-sm rounded-xl font-medium
-                               hover:from-indigo-600 hover:to-purple-600
-                               shadow-lg shadow-indigo-500/30
-                               transition-all duration-300
-                               flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    Message
-                  </Motion.button>
-                  
-                  <Motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-white/5 backdrop-blur
-                               text-white text-sm rounded-xl font-medium
-                               border border-white/10 hover:border-white/20
-                               hover:bg-white/10 transition-all duration-300
-                               flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Email
-                  </Motion.button>
-                </div>
+              <div className="mt-3 space-y-1 text-sm text-gray-400">
+                <p className="hover:text-indigo-400 transition-colors">
+                  ✉ {cr.email}
+                </p>
+                <p className="hover:text-indigo-400 transition-colors">
+                  📞 {cr.phone}
+                </p>
               </div>
             </div>
-
-            {/* Bottom Accent Line with Animation */}
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
           </div>
+
+          {/* Bottom Accent Line */}
+          <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-purple-500 group-hover:w-full transition-all duration-500"></div>
         </Motion.div>
       );
     })}
   </div>
-
-  {/* Add custom CSS for animations */}
-  <style jsx>{`
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .animate-gradient {
-      background-size: 300% 300%;
-      animation: gradient 6s ease infinite;
-    }
-    .animation-delay-2000 {
-      animation-delay: 2s;
-    }
-    .animation-delay-300 {
-      animation-delay: 300ms;
-    }
-  `}</style>
 </section>
 
         {/* Class Routine */}
