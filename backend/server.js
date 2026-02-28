@@ -33,11 +33,11 @@ io.on("connection", (socket) => {
 });
 
 
-// Serve frontend build files
-app.use(express.static(path.join(__dirname, "dist")));
+// Serve React frontend
+app.use(express.static(path.join(__dirname, "client/build")));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
 server.listen(PORT, () => {
