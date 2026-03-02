@@ -576,28 +576,6 @@ const StudentDashboard = () => {
                       >
                         {n.category?.toUpperCase() || "GENERAL"}
                       </span>
-                      <button
-                        type="button"
-                        aria-expanded={isExpanded}
-                        aria-controls={`notice-content-${n._id}`}
-                        onClick={() => toggleNoticeExpand(n._id)}
-                        className="sm:hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-indigo-200 bg-indigo-500/15 border border-indigo-500/30 active:scale-95 transition"
-                      >
-                        {isExpanded ? "Collapse" : "Expand"}
-                        <svg
-                          className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : "rotate-0"}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </button>
                     </div>
                   </div>
 
@@ -611,6 +589,31 @@ const StudentDashboard = () => {
                     <div className="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed">
                       <ReactMarkdown>{n.content}</ReactMarkdown>
                     </div>
+                  </div>
+
+                  <div className="pl-11 mb-4 sm:hidden">
+                    <button
+                      type="button"
+                      aria-expanded={isExpanded}
+                      aria-controls={`notice-content-${n._id}`}
+                      onClick={() => toggleNoticeExpand(n._id)}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-300 hover:text-indigo-200 transition-colors"
+                    >
+                      {isExpanded ? "See less" : "See more"}
+                      <svg
+                        className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : "rotate-0"}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
                   </div>
 
                   {/* Footer with date and metadata */}
