@@ -27,8 +27,13 @@ const AuthProvider = ({ children }) => {
       return;
     }
 
-    localStorage.setItem("userInfo", JSON.stringify(data));
-    setUser(data);
+    const userWithLoginTime = {
+      ...data,
+      loginAt: data.loginAt || new Date().toISOString(),
+    };
+
+    localStorage.setItem("userInfo", JSON.stringify(userWithLoginTime));
+    setUser(userWithLoginTime);
   };
 
   const logout = () => {

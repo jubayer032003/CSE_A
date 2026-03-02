@@ -84,6 +84,36 @@ const StudentDashboard = () => {
     }));
   };
 
+  const formatLastLogin = (loginAt) => {
+    if (!loginAt) return "N/A";
+
+    const loginDate = new Date(loginAt);
+    if (Number.isNaN(loginDate.getTime())) return "N/A";
+
+    const now = new Date();
+    const isToday = now.toDateString() === loginDate.toDateString();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = yesterday.toDateString() === loginDate.toDateString();
+
+    const dayText = isToday
+      ? "Today"
+      : isYesterday
+        ? "Yesterday"
+        : loginDate.toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+
+    const timeText = loginDate.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
+    return `${dayText} ${timeText}`;
+  };
+
   const classReps = [
     {
       id: 1,
@@ -180,12 +210,12 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          {/* Quick stats row (optional) */}
+          {/* Quick stats row */}
           <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-700/50">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
               <span className="text-xs text-gray-500">
-                Last login: Today 10:30 AM
+                Last login: {formatLastLogin(user?.loginAt)}
               </span>
             </div>
             <div className="flex items-center gap-2">
