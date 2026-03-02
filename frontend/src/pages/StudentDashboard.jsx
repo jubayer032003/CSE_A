@@ -14,6 +14,7 @@ const StudentDashboard = () => {
   const [yearFilter, setYearFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [expandedNotices, setExpandedNotices] = useState({});
+  const [showAllNotices, setShowAllNotices] = useState(false);
 
   const fetchRoutine = async () => {
     try {
@@ -69,6 +70,12 @@ const StudentDashboard = () => {
       (yearFilter === "all" || n.year === yearFilter) &&
       (semesterFilter === "all" || n.semester === semesterFilter),
   );
+  const sortedNotices = [...notices].sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
+  const visibleNotices = showAllNotices ? sortedNotices : sortedNotices.slice(0, 3);
 
   const toggleNoticeExpand = (noticeId) => {
     setExpandedNotices((prev) => ({
@@ -493,7 +500,7 @@ const StudentDashboard = () => {
           </Motion.div>
 
           <div className="space-y-4">
-            {notices.map((n, index) => {
+            {visibleNotices.map((n, index) => {
               const isExpanded = Boolean(expandedNotices[n._id]);
 
               return (
@@ -693,6 +700,31 @@ const StudentDashboard = () => {
                 </Motion.div>
               );
             })}
+
+            {sortedNotices.length > 3 && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAllNotices((prev) => !prev)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-200 hover:bg-indigo-500/20 transition-colors"
+                >
+                  {showAllNotices ? "See fewer notices" : "See more notices"}
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${showAllNotices ? "rotate-180" : "rotate-0"}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
 
             {notices.length === 0 && (
               <Motion.div
