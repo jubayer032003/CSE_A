@@ -13,6 +13,7 @@ const StudentDashboard = () => {
   const [notes, setNotes] = useState([]);
   const [yearFilter, setYearFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
+  const [expandedNotices, setExpandedNotices] = useState({});
 
   const fetchRoutine = async () => {
     try {
@@ -68,6 +69,13 @@ const StudentDashboard = () => {
       (yearFilter === "all" || n.year === yearFilter) &&
       (semesterFilter === "all" || n.semester === semesterFilter),
   );
+
+  const toggleNoticeExpand = (noticeId) => {
+    setExpandedNotices((prev) => ({
+      ...prev,
+      [noticeId]: !prev[noticeId],
+    }));
+  };
 
   const classReps = [
     {
@@ -485,16 +493,19 @@ const StudentDashboard = () => {
           </Motion.div>
 
           <div className="space-y-4">
-            {notices.map((n, index) => (
-              <Motion.div
-                key={n._id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -2 }}
-                className="group relative"
-              >
+            {notices.map((n, index) => {
+              const isExpanded = Boolean(expandedNotices[n._id]);
+
+              return (
+                <Motion.div
+                  key={n._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -2 }}
+                  className="group relative"
+                >
                 {/* Glow effect on hover */}
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl opacity-0 group-hover:opacity-20 blur transition duration-300"></div>
 
@@ -555,19 +566,48 @@ const StudentDashboard = () => {
                       </h3>
                     </div>
 
-                    <span
-                      className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                        n.category === "urgent"
-                          ? "bg-red-900/30 text-red-300 border border-red-700/50"
-                          : "bg-indigo-900/30 text-indigo-300 border border-indigo-700/50"
-                      }`}
-                    >
-                      {n.category?.toUpperCase() || "GENERAL"}
-                    </span>
+                    <div className="flex items-center gap-2 self-start sm:self-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                          n.category === "urgent"
+                            ? "bg-red-900/30 text-red-300 border border-red-700/50"
+                            : "bg-indigo-900/30 text-indigo-300 border border-indigo-700/50"
+                        }`}
+                      >
+                        {n.category?.toUpperCase() || "GENERAL"}
+                      </span>
+                      <button
+                        type="button"
+                        aria-expanded={isExpanded}
+                        aria-controls={`notice-content-${n._id}`}
+                        onClick={() => toggleNoticeExpand(n._id)}
+                        className="sm:hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-indigo-200 bg-indigo-500/15 border border-indigo-500/30 active:scale-95 transition"
+                      >
+                        {isExpanded ? "Collapse" : "Expand"}
+                        <svg
+                          className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : "rotate-0"}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Content with proper spacing */}
-                  <div className="pl-11 mb-4">
+                  <div
+                    id={`notice-content-${n._id}`}
+                    className={`pl-11 mb-4 transition-all duration-300 overflow-hidden ${
+                      isExpanded ? "max-h-[1200px]" : "max-h-20 sm:max-h-[1200px]"
+                    }`}
+                  >
                     <div className="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed">
                       <ReactMarkdown>{n.content}</ReactMarkdown>
                     </div>
@@ -647,8 +687,9 @@ const StudentDashboard = () => {
                     </div>
                   )}
                 </div>
-              </Motion.div>
-            ))}
+                </Motion.div>
+              );
+            })}
 
             {notices.length === 0 && (
               <Motion.div
