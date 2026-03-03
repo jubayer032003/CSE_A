@@ -19,54 +19,54 @@ const StudentDashboard = () => {
   const noticeSectionRef = useRef(null);
   const noticeButtonWrapRef = useRef(null);
 
-  const fetchRoutine = async () => {
-    try {
-      const { data } = await axios.get("/api/routine", {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      });
-      setRoutine(data);
-    } catch (error) {
-      console.error("Error fetching routine:", error);
-    }
-  };
-
-  const fetchNotices = async () => {
-    try {
-      const { data } = await axios.get("/api/notices");
-      setNotices(data);
-    } catch (error) {
-      console.error("Error fetching notices:", error);
-    }
-  };
-
-  const fetchNotes = async () => {
-    try {
-      const { data } = await axios.get("/api/notes");
-      setNotes(data);
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-    }
-  };
-
   useEffect(() => {
-    if (user?.token) {
-      const initializeData = async () => {
-        await fetchRoutine();
-        await fetchNotices();
-        await fetchNotes();
-      };
+    if (!user?.token) return;
 
-      initializeData();
+    const fetchRoutine = async () => {
+      try {
+        const { data } = await axios.get("/api/routine", {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+        setRoutine(data);
+      } catch (error) {
+        console.error("Error fetching routine:", error);
+      }
+    };
 
-      socket.on("notice-updated", fetchNotices);
-      socket.on("notes-updated", fetchNotes);
+    const fetchNotices = async () => {
+      try {
+        const { data } = await axios.get("/api/notices");
+        setNotices(data);
+      } catch (error) {
+        console.error("Error fetching notices:", error);
+      }
+    };
 
-      return () => {
-        socket.off("notice-updated", fetchNotices);
-        socket.off("notes-updated", fetchNotes);
-      };
-    }
-  }, [user]);
+    const fetchNotes = async () => {
+      try {
+        const { data } = await axios.get("/api/notes");
+        setNotes(data);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    };
+
+    const initializeData = async () => {
+      await fetchRoutine();
+      await fetchNotices();
+      await fetchNotes();
+    };
+
+    initializeData();
+
+    socket.on("notice-updated", fetchNotices);
+    socket.on("notes-updated", fetchNotes);
+
+    return () => {
+      socket.off("notice-updated", fetchNotices);
+      socket.off("notes-updated", fetchNotes);
+    };
+  }, [user?.token]);
 
   const filteredNotes = notes.filter(
     (n) =>
@@ -180,71 +180,45 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <style>{`
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
       {/* Header */}
-      <header className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700/50 sticky top-0 z-50 backdrop-blur-lg backdrop-saturate-150">
+      <header className="bg-gray-900/90 border-b border-gray-700/60 sticky top-0 z-50 backdrop-blur-lg">
         {/* Top accent line */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          {/* Welcome Section with Glassmorphism Effect */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-700/50 shadow-xl">
-            {/* Left side - Welcome text with avatar */}
-            <div className="flex items-center gap-4">
-              {/* User Avatar with gradient ring */}
-              <div className="relative hidden sm:block">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-[2px] shadow-lg shadow-purple-500/20">
-                  <div className="w-full h-full rounded-2xl bg-gray-900 flex items-center justify-center">
-                    <span className="text-xl font-bold text-white">
-                      {user?.name?.charAt(0) || "S"}
-                    </span>
-                  </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                  {user?.name?.charAt(0) || "S"}
                 </div>
-                {/* Online status indicator */}
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full"></div>
               </div>
-
-              {/* Welcome text */}
-              <div>
-                <h1
-                  className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
-                  style={{ backgroundSize: "200% 200%", animation: "gradient 3s ease infinite" }}
-                >
-                  Student Dashboard
-                </h1>
-                <div className="flex items-center gap-2 text-sm sm:text-base mt-1">
-                  <span className="text-gray-400">Welcome back,</span>
-                  <span className="text-white font-semibold flex items-center gap-1.5 bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/50">
-                    {/* Mobile avatar */}
-                    <span className="sm:hidden w-5 h-5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold">
-                      {user?.name?.charAt(0) || "S"}
-                    </span>
-                    {user?.name}
-                    <svg
-                      className="w-4 h-4 text-indigo-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </span>
-                </div>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-semibold text-white">Student Dashboard</h1>
+                <p className="text-xs sm:text-sm text-gray-400 truncate">
+                  Welcome, <span className="text-gray-200">{user?.name}</span>
+                </p>
               </div>
             </div>
 
-            {/* Right section with actions */}
-            <div className="flex items-center gap-3 relative">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                  Last login: {formatLastLogin(user?.loginAt)}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                  Role: Student
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+                  ID: {user?.studentId || "STU001"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 relative">
               {/* Notification button */}
               <div ref={noticeButtonWrapRef} className="relative">
                 <button
@@ -252,7 +226,7 @@ const StudentDashboard = () => {
                   onClick={handleNotificationClick}
                   title="Show latest notices"
                   aria-label="Show latest notices"
-                  className="relative p-2.5 text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-200 border border-gray-700/50 hover:border-gray-600"
+                  className="relative p-2 text-gray-400 hover:text-white bg-gray-800/60 hover:bg-gray-700/60 rounded-lg transition-all duration-200 border border-gray-700/60 hover:border-gray-600"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -306,14 +280,11 @@ const StudentDashboard = () => {
               {/* Logout button with enhanced design */}
               <button
                 onClick={logout}
-                className="group relative inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-lg hover:shadow-red-500/25 active:scale-95 border border-red-400/20"
+                className="group relative inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white text-sm font-medium rounded-lg transition-all duration-200 border border-red-400/20"
               >
-                {/* Animated background effect */}
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-600 to-red-500 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-200 -z-10"></div>
-
                 {/* Logout icon */}
                 <svg
-                  className="w-4 h-4 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -334,27 +305,8 @@ const StudentDashboard = () => {
               </button>
             </div>
           </div>
-
-          {/* Quick stats row */}
-          <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-700/50">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-              <span className="text-xs text-gray-500">
-                Last login: {formatLastLogin(user?.loginAt)}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-              <span className="text-xs text-gray-500">Role: Student</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-              <span className="text-xs text-gray-500">
-                ID: {user?.studentId || "STU001"}
-              </span>
-            </div>
-          </div>
         </div>
+      </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
