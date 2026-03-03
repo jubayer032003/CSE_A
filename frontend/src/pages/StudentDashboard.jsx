@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -15,6 +15,9 @@ const StudentDashboard = () => {
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [expandedNotices, setExpandedNotices] = useState({});
   const [showAllNotices, setShowAllNotices] = useState(false);
+  const [showNoticeDropdown, setShowNoticeDropdown] = useState(false);
+  const noticeSectionRef = useRef(null);
+  const noticeButtonWrapRef = useRef(null);
 
   const fetchRoutine = async () => {
     try {
@@ -76,6 +79,7 @@ const StudentDashboard = () => {
     return dateB - dateA;
   });
   const visibleNotices = showAllNotices ? sortedNotices : sortedNotices.slice(0, 3);
+  const previewNotices = sortedNotices.slice(0, 3);
 
   const toggleNoticeExpand = (noticeId) => {
     setExpandedNotices((prev) => ({
@@ -83,6 +87,43 @@ const StudentDashboard = () => {
       [noticeId]: !prev[noticeId],
     }));
   };
+
+  const handleNotificationClick = () => {
+    setShowNoticeDropdown((prev) => !prev);
+  };
+
+  const goToNoticeBoard = () => {
+    if (!noticeSectionRef.current) return;
+
+    noticeSectionRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    noticeSectionRef.current.focus();
+    setShowNoticeDropdown(false);
+  };
+
+  const handleNoticePreviewClick = (noticeId) => {
+    setExpandedNotices((prev) => ({
+      ...prev,
+      [noticeId]: true,
+    }));
+    goToNoticeBoard();
+  };
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        noticeButtonWrapRef.current &&
+        !noticeButtonWrapRef.current.contains(event.target)
+      ) {
+        setShowNoticeDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
   const formatLastLogin = (loginAt) => {
     if (!loginAt) return "N/A";
@@ -203,14 +244,64 @@ const StudentDashboard = () => {
             </div>
 
             {/* Right section with actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 relative">
               {/* Notification button */}
-              <button className="relative p-2.5 text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-200 border border-gray-700/50 hover:border-gray-600">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"></span>
-              </button>
+              <div ref={noticeButtonWrapRef} className="relative">
+                <button
+                  type="button"
+                  onClick={handleNotificationClick}
+                  title="Show latest notices"
+                  aria-label="Show latest notices"
+                  className="relative p-2.5 text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 rounded-xl transition-all duration-200 border border-gray-700/50 hover:border-gray-600"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  {notices.length > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"></span>
+                  )}
+                </button>
+
+                {showNoticeDropdown && (
+                  <div className="absolute right-0 mt-2 w-80 max-w-[85vw] rounded-2xl border border-gray-700/70 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-gray-700/60">
+                      <p className="text-sm font-semibold text-white">Latest Notices</p>
+                    </div>
+
+                    {previewNotices.length > 0 ? (
+                      <div className="max-h-80 overflow-y-auto">
+                        {previewNotices.map((notice) => (
+                          <button
+                            key={notice._id}
+                            type="button"
+                            onClick={() => handleNoticePreviewClick(notice._id)}
+                            className="w-full text-left px-4 py-3 border-b border-gray-800/80 hover:bg-gray-800/70 transition-colors"
+                          >
+                            <p className="text-sm font-medium text-gray-100 truncate">
+                              {notice.title || "Untitled Notice"}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {notice.createdAt
+                                ? new Date(notice.createdAt).toLocaleString()
+                                : "No date"}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="px-4 py-6 text-sm text-gray-400">No notices yet.</p>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={goToNoticeBoard}
+                      className="w-full px-4 py-3 text-sm text-indigo-300 hover:text-indigo-200 hover:bg-gray-800/70 transition-colors"
+                    >
+                      View all notices
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Logout button with enhanced design */}
               <button
@@ -267,71 +358,187 @@ const StudentDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Class Representatives */}
-        <section className="mb-20">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-10 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-            Class Representatives
-          </h2>
+                {/* Class Representatives */}
+        <section className="mb-20 relative">
+          {/* Section Header with decorative elements */}
+          <div className="relative mb-12 text-center md:text-left">
+            {/* Background decorative blob */}
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/5 blur-3xl rounded-full"></div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="relative inline-block">
+              <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Class Representatives
+              </h2>
+              {/* Animated underline */}
+              <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mt-2 mx-auto md:mx-0"></div>
+            </div>
+
+            {/* Subtitle */}
+            <p className="text-gray-400 mt-4 max-w-2xl mx-auto md:mx-0">
+              Meet your dedicated class representatives ready to assist you
+            </p>
+          </div>
+
+          {/* Grid Layout - Responsive Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
             {classReps.map((cr, index) => {
               const initials = cr.name
                 .split(" ")
                 .map((n) => n[0])
                 .join("")
-                .toUpperCase();
+                .toUpperCase()
+                .slice(0, 2);
 
               return (
                 <Motion.div
                   key={cr.id}
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ y: -6 }}
-                  viewport={{ once: true }}
-                  className="relative group bg-gradient-to-br from-gray-900/80 to-gray-800/70
-                     backdrop-blur-xl rounded-3xl p-7
-                     border border-gray-700/60
-                     hover:border-indigo-500/60
-                     shadow-lg hover:shadow-indigo-500/20
-                     transition-all duration-300 overflow-hidden"
+                  transition={{
+                    duration: 0.5,
+                    delay: index * 0.1,
+                    type: "spring",
+                    stiffness: 100,
+                  }}
+                  whileHover={{
+                    y: -8,
+                    transition: { duration: 0.2 },
+                  }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  className="relative group"
                 >
-                  {/* Glow Effect */}
-                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full group-hover:bg-indigo-500/20 transition-all duration-500"></div>
+                  {/* Card Container */}
+                  <div
+                    className="relative h-full bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90
+                        backdrop-blur-xl rounded-3xl p-6
+                        border border-gray-700/50
+                        hover:border-indigo-500/50
+                        shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10
+                        transition-all duration-300
+                        flex flex-col
+                        overflow-hidden"
+                  >
+                    {/* Gradient Orbs */}
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full group-hover:bg-indigo-500/20 transition-all duration-500"></div>
+                    <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all duration-500"></div>
 
-                  <div className="flex items-center gap-6 relative z-10">
-                    {/* Initial Avatar */}
-                    <div
-                      className="w-20 h-20 flex items-center justify-center 
-                            rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 
-                            text-white text-xl font-bold shadow-lg"
-                    >
-                      {initials}
-                    </div>
+                    {/* Card Header with Avatar */}
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                      {/* Avatar with glow effect */}
+                      <div className="relative mb-4">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                        <div
+                          className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center
+                              rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600
+                              text-white text-2xl sm:text-3xl font-bold
+                              shadow-lg group-hover:scale-105 transition-transform duration-300
+                              border-2 border-white/10 group-hover:border-white/20"
+                        >
+                          {initials}
+                          {/* Online indicator (optional) */}
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                        </div>
+                      </div>
 
-                    {/* Info */}
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-white tracking-wide">
+                      {/* Name with gradient on hover */}
+                      <h3
+                        className="text-xl sm:text-2xl font-semibold text-white tracking-wide mb-3
+                           group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400
+                           group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300"
+                      >
                         {cr.name}
                       </h3>
 
-                      <div className="mt-3 space-y-1 text-sm text-gray-400">
-                        <p className="hover:text-indigo-400 transition-colors">
-                          ✉ {cr.email}
-                        </p>
-                        <p className="hover:text-indigo-400 transition-colors">
-                          📞 {cr.phone}
-                        </p>
+                      {/* Contact Info with Icons */}
+                      <div className="w-full space-y-2 text-sm sm:text-base">
+                        {/* Email */}
+                        <div
+                          className="flex items-center justify-center gap-2 text-gray-400
+                              group-hover:text-gray-300 transition-colors"
+                        >
+                          <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <span className="truncate max-w-[180px]">{cr.email}</span>
+                        </div>
+
+                        {/* Phone */}
+                        <div
+                          className="flex items-center justify-center gap-2 text-gray-400
+                              group-hover:text-gray-300 transition-colors"
+                        >
+                          <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
+                          </svg>
+                          <span>{cr.phone}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Bottom Accent Line */}
-                  <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-purple-500 group-hover:w-full transition-all duration-500"></div>
+                    {/* Quick Actions (optional hover menu) */}
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button className="p-2 bg-gray-800/80 backdrop-blur-sm rounded-xl hover:bg-indigo-500/20 border border-gray-700/50">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Bottom Accent Line */}
+                    <div
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[3px]
+                          bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+                          group-hover:w-full transition-all duration-500 rounded-full"
+                    ></div>
+                  </div>
                 </Motion.div>
               );
             })}
           </div>
+
+          {/* Empty State (if no reps) */}
+          {classReps.length === 0 && (
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-800/50 rounded-3xl mb-4">
+                <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-300 mb-2">No Representatives</h3>
+              <p className="text-gray-500">Check back later for updates</p>
+            </div>
+          )}
+
+          {/* View All Button (optional) */}
+          {classReps.length > 4 && (
+            <div className="text-center mt-10">
+              <button
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800/50 hover:bg-gray-700/50
+                       rounded-xl text-gray-300 hover:text-white transition-all duration-200
+                       border border-gray-700/50 hover:border-indigo-500/50"
+              >
+                <span>View All Representatives</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Class Routine */}
@@ -539,7 +746,11 @@ const StudentDashboard = () => {
           </Motion.div>
         </section>
         {/* Notice Board */}
-        <section className="mb-12">
+        <section
+          className="mb-12"
+          ref={noticeSectionRef}
+          tabIndex={-1}
+        >
           <Motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1203,3 +1414,4 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+
