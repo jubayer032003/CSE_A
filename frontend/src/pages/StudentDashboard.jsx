@@ -273,7 +273,7 @@ const StudentDashboard = () => {
                   />
                 </svg>
                 <span className="hidden sm:inline">Logout</span>
-                <span className="sm:hidden">Exit</span>
+                <span className="sm:hidden">Logout</span>
               </button>
             </div>
           </div>
