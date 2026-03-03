@@ -185,48 +185,31 @@ const StudentDashboard = () => {
         {/* Top accent line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="relative flex-shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
                   {user?.name?.charAt(0) || "S"}
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></div>
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg sm:text-xl font-semibold text-white">Student Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-400 truncate">
+                <h1 className="text-base sm:text-lg font-semibold text-white leading-tight">Student Dashboard</h1>
+                <p className="hidden sm:block text-xs text-gray-400 truncate">
                   Welcome, <span className="text-gray-200">{user?.name}</span>
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                  Last login: {formatLastLogin(user?.loginAt)}
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-                  Role: Student
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
-                  ID: {user?.studentId || "STU001"}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 relative">
-              {/* Notification button */}
+            <div className="flex items-center gap-2">
               <div ref={noticeButtonWrapRef} className="relative">
                 <button
                   type="button"
                   onClick={handleNotificationClick}
                   title="Show latest notices"
                   aria-label="Show latest notices"
-                  className="relative p-2 text-gray-400 hover:text-white bg-gray-800/60 hover:bg-gray-700/60 rounded-lg transition-all duration-200 border border-gray-700/60 hover:border-gray-600"
+                  className="relative p-2 text-gray-300 hover:text-white bg-gray-800/70 hover:bg-gray-700/70 rounded-lg transition-all duration-200 border border-gray-700/60 hover:border-gray-600"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -237,7 +220,7 @@ const StudentDashboard = () => {
                 </button>
 
                 {showNoticeDropdown && (
-                  <div className="absolute right-0 mt-2 w-80 max-w-[85vw] rounded-2xl border border-gray-700/70 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden">
+                  <div className="absolute right-0 left-auto sm:right-0 sm:left-auto max-sm:left-1/2 max-sm:-translate-x-1/2 mt-2 w-[92vw] max-w-[92vw] sm:w-80 sm:max-w-[24rem] rounded-xl border border-gray-700/70 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden">
                     <div className="px-4 py-3 border-b border-gray-700/60">
                       <p className="text-sm font-semibold text-white">Latest Notices</p>
                     </div>
@@ -277,18 +260,11 @@ const StudentDashboard = () => {
                 )}
               </div>
 
-              {/* Logout button with enhanced design */}
               <button
                 onClick={logout}
-                className="group relative inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white text-sm font-medium rounded-lg transition-all duration-200 border border-red-400/20"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 border border-red-400/20"
               >
-                {/* Logout icon */}
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -296,199 +272,114 @@ const StudentDashboard = () => {
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
-
-                {/* Text hidden on mobile, shown on larger screens */}
                 <span className="hidden sm:inline">Logout</span>
-
-                {/* Mobile text */}
                 <span className="sm:hidden">Exit</span>
               </button>
             </div>
           </div>
+
+          <div className="mt-2.5 sm:hidden grid grid-cols-2 gap-2">
+            <span className="col-span-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-700/70 bg-gray-800/60 text-[11px] text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              Last login: {formatLastLogin(user?.loginAt)}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-700/70 bg-gray-800/60 text-[11px] text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              Role: Student
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-700/70 bg-gray-800/60 text-[11px] text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+              ID: {user?.studentId || "STU001"}
+            </span>
+          </div>
+
+          <div className="hidden sm:flex flex-wrap items-center gap-2 text-xs mt-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              Last login: {formatLastLogin(user?.loginAt)}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              Role: Student
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-gray-700/70 bg-gray-800/60 text-gray-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+              ID: {user?.studentId || "STU001"}
+            </span>
+          </div>
         </div>
-      </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Class Representatives */}
-        <section className="mb-20 relative">
-          {/* Section Header with decorative elements */}
-          <div className="relative mb-12 text-center md:text-left">
-            {/* Background decorative blob */}
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/5 blur-3xl rounded-full"></div>
-
-            <div className="relative inline-block">
-              <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+        {/* Class Representatives */}
+        <section className="mb-12">
+          <div className="flex items-end justify-between gap-3 mb-5">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 Class Representatives
               </h2>
-              {/* Animated underline */}
-              <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mt-2 mx-auto md:mx-0"></div>
+              <p className="text-sm text-gray-400 mt-1">
+                Contact your class reps for support and updates
+              </p>
             </div>
-
-            {/* Subtitle */}
-            <p className="text-gray-400 mt-4 max-w-2xl mx-auto md:mx-0">
-              Meet your dedicated class representatives ready to assist you
-            </p>
+            <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg text-xs border border-gray-700/70 bg-gray-800/60 text-gray-300">
+              {classReps.length} reps
+            </span>
           </div>
 
-          {/* Grid Layout - Responsive Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
-            {classReps.map((cr, index) => {
-              const initials = cr.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2);
+          {classReps.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {classReps.map((cr, index) => {
+                const initials = cr.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2);
 
-              return (
-                <Motion.div
-                  key={cr.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    delay: index * 0.1,
-                    type: "spring",
-                    stiffness: 100,
-                  }}
-                  whileHover={{
-                    y: -8,
-                    transition: { duration: 0.2 },
-                  }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  className="relative group"
-                >
-                  {/* Card Container */}
-                  <div
-                    className="relative h-full bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90
-                        backdrop-blur-xl rounded-3xl p-6
-                        border border-gray-700/50
-                        hover:border-indigo-500/50
-                        shadow-lg hover:shadow-2xl hover:shadow-indigo-500/10
-                        transition-all duration-300
-                        flex flex-col
-                        overflow-hidden"
+                return (
+                  <Motion.div
+                    key={cr.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: index * 0.05 }}
+                    viewport={{ once: true }}
+                    className="rounded-xl border border-gray-700/70 bg-gradient-to-br from-gray-900/90 to-gray-800/80 p-4 hover:border-indigo-500/50 transition-colors"
                   >
-                    {/* Gradient Orbs */}
-                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500/10 blur-3xl rounded-full group-hover:bg-indigo-500/20 transition-all duration-500"></div>
-                    <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/10 blur-3xl rounded-full group-hover:bg-purple-500/20 transition-all duration-500"></div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                        {initials}
+                      </div>
 
-                    {/* Card Header with Avatar */}
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                      {/* Avatar with glow effect */}
-                      <div className="relative mb-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
-                        <div
-                          className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center
-                              rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600
-                              text-white text-2xl sm:text-3xl font-bold
-                              shadow-lg group-hover:scale-105 transition-transform duration-300
-                              border-2 border-white/10 group-hover:border-white/20"
-                        >
-                          {initials}
-                          {/* Online indicator (optional) */}
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-base font-semibold text-white truncate">{cr.name}</h3>
+
+                        <div className="mt-2 space-y-1.5 text-sm">
+                          <p className="text-gray-400 truncate">
+                            <span className="text-indigo-300 mr-1.5">ID:</span>
+                            {cr.email}
+                          </p>
+                          <p className="text-gray-400 truncate">
+                            <span className="text-purple-300 mr-1.5">Phone:</span>
+                            {cr.phone}
+                          </p>
                         </div>
                       </div>
 
-                      {/* Name with gradient on hover */}
-                      <h3
-                        className="text-xl sm:text-2xl font-semibold text-white tracking-wide mb-3
-                           group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400
-                           group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300"
+                      <a
+                        href={`tel:${cr.phone?.replace(/[^+\d]/g, "")}`}
+                        className="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs border border-indigo-500/30 text-indigo-300 hover:text-indigo-200 hover:bg-indigo-500/10 transition-colors"
                       >
-                        {cr.name}
-                      </h3>
-
-                      {/* Contact Info with Icons */}
-                      <div className="w-full space-y-2 text-sm sm:text-base">
-                        {/* Email */}
-                        <div
-                          className="flex items-center justify-center gap-2 text-gray-400
-                              group-hover:text-gray-300 transition-colors"
-                        >
-                          <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                          </svg>
-                          <span className="truncate max-w-[180px]">{cr.email}</span>
-                        </div>
-
-                        {/* Phone */}
-                        <div
-                          className="flex items-center justify-center gap-2 text-gray-400
-                              group-hover:text-gray-300 transition-colors"
-                        >
-                          <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                            />
-                          </svg>
-                          <span>{cr.phone}</span>
-                        </div>
-                      </div>
+                        Call
+                      </a>
                     </div>
-
-                    {/* Quick Actions (optional hover menu) */}
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <button className="p-2 bg-gray-800/80 backdrop-blur-sm rounded-xl hover:bg-indigo-500/20 border border-gray-700/50">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Bottom Accent Line */}
-                    <div
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[3px]
-                          bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
-                          group-hover:w-full transition-all duration-500 rounded-full"
-                    ></div>
-                  </div>
-                </Motion.div>
-              );
-            })}
-          </div>
-
-          {/* Empty State (if no reps) */}
-          {classReps.length === 0 && (
-            <div className="text-center py-16">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-800/50 rounded-3xl mb-4">
-                <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-300 mb-2">No Representatives</h3>
-              <p className="text-gray-500">Check back later for updates</p>
+                  </Motion.div>
+                );
+              })}
             </div>
-          )}
-
-          {/* View All Button (optional) */}
-          {classReps.length > 4 && (
-            <div className="text-center mt-10">
-              <button
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800/50 hover:bg-gray-700/50
-                       rounded-xl text-gray-300 hover:text-white transition-all duration-200
-                       border border-gray-700/50 hover:border-indigo-500/50"
-              >
-                <span>View All Representatives</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
+          ) : (
+            <div className="text-center py-10 rounded-xl border border-gray-700/70 bg-gray-800/40">
+              <p className="text-gray-400">No representatives available right now.</p>
             </div>
           )}
         </section>
