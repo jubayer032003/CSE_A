@@ -961,9 +961,7 @@ const StudentDashboard = () => {
                   65 Compiler Learning Lounge
                 </h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">
-                  Curated YouTube lessons from your CR for quick revision,
-                  concept clearing, and subject-focused practice. Filter by
-                  subject tag and jump straight into the right topic.
+                  65 Compiler is a YouTube channel built by CSE undergrads,  — where we teach what we learn to make quality education more accessible. Our goal is simple: break down complex computer science concepts into clear, approachable content that we wish we had when we started. Learning is better when we do it together.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
