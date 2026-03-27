@@ -1011,17 +1011,6 @@ const StudentDashboard = () => {
                     Filterable subject categories
                   </p>
                 </div>
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                  <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">
-                    Format
-                  </p>
-                  <p className="mt-3 text-xl font-semibold text-white">
-                    Responsive
-                  </p>
-                  <p className="mt-2 text-sm text-gray-400">
-                    Clean cards on desktop and mobile
-                  </p>
-                </div>
               </div>
             </div>
           </Motion.div>
