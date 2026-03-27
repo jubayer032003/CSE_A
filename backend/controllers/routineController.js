@@ -13,6 +13,11 @@ exports.addRoutine = async (req, res) => {
   }
 
   const newRoutine = await Routine.create(req.body);
+
+  if (global.io) {
+    global.io.emit("routine-updated");
+  }
+
   res.status(201).json(newRoutine);
 };
 
@@ -28,6 +33,10 @@ exports.updateRoutine = async (req, res) => {
     { new: true }
   );
 
+  if (global.io) {
+    global.io.emit("routine-updated");
+  }
+
   res.json(updated);
 };
 
@@ -38,5 +47,10 @@ exports.deleteRoutine = async (req, res) => {
   }
 
   await Routine.findByIdAndDelete(req.params.id);
+
+  if (global.io) {
+    global.io.emit("routine-updated");
+  }
+
   res.json({ message: "Deleted successfully" });
 };

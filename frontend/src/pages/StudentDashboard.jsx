@@ -81,8 +81,10 @@ const StudentDashboard = () => {
     socket.on("notice-updated", fetchNotices);
     socket.on("notes-updated", fetchNotes);
     socket.on("compiler-videos-updated", fetchCompilerVideos);
+    socket.on("routine-updated", fetchRoutine);
 
     return () => {
+      socket.off("routine-updated", fetchRoutine);
       socket.off("notice-updated", fetchNotices);
       socket.off("notes-updated", fetchNotes);
       socket.off("compiler-videos-updated", fetchCompilerVideos);
