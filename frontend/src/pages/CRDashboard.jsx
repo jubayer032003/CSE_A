@@ -41,6 +41,11 @@ const getEmbedUrl = (url) => {
   return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
 };
 
+const getThumbnailUrl = (url) => {
+  const videoId = extractYouTubeVideoId(url);
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+};
+
 const CRDashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
@@ -941,63 +946,79 @@ const CRDashboard = () => {
             )}
           </div>
 
-          <div className="mt-8 grid gap-5 xl:grid-cols-2">
+          <div className="mt-8 rounded-[1.75rem] border border-white/10 bg-slate-950/35 p-4 sm:p-5">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Published Library</h3>
+                <p className="text-sm text-white/55">
+                  Compact management view for cleaner browsing when the library grows.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
             {compilerVideos.map((video) => {
-              const embedUrl = getEmbedUrl(video.youtubeUrl);
+              const thumbnailUrl = getThumbnailUrl(video.youtubeUrl);
 
               return (
                 <article
                   key={video._id}
-                  className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5"
+                  className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 transition hover:border-cyan-400/30 hover:bg-white/[0.07]"
                 >
-                  <div className="aspect-video w-full bg-slate-950">
-                    {embedUrl ? (
-                      <iframe
-                        src={embedUrl}
-                        title={video.title}
-                        className="h-full w-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
+                  <div className="relative aspect-video w-full bg-slate-950">
+                    {thumbnailUrl ? (
+                      <img
+                        src={thumbnailUrl}
+                        alt={video.title}
+                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center text-sm text-white/45">
                         Invalid YouTube link
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                    <div className="absolute left-4 top-4 rounded-full border border-cyan-400/20 bg-slate-950/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                      {video.subject}
+                    </div>
                   </div>
 
                   <div className="space-y-4 p-5">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-                        {video.subject}
-                      </span>
-                      <span className="text-xs text-white/40">
-                        {new Date(video.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">{video.title}</h3>
-                      {video.description && (
-                        <p className="mt-2 text-sm leading-6 text-white/70">
-                          {video.description}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-semibold text-white">{video.title}</h3>
+                        <p className="mt-1 text-xs text-white/40">
+                          Added {new Date(video.createdAt).toLocaleDateString()}
                         </p>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap gap-3">
+                      </div>
                       <a
                         href={video.youtubeUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10"
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/10"
                       >
-                        Open YouTube
+                        Open
                       </a>
+                    </div>
+
+                    <p className="min-h-[3.5rem] text-sm leading-6 text-white/70">
+                      {video.description || "No description added yet."}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-white/40">
+                      <span className="rounded-full bg-white/5 px-3 py-1">
+                        {new Date(video.createdAt).toLocaleDateString()}
+                      </span>
+                      <span className="rounded-full bg-white/5 px-3 py-1">
+                        Tag: {video.subject}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
                         onClick={() => editCompilerVideo(video)}
-                        className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100 transition hover:bg-cyan-400/20"
+                        className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100 transition hover:bg-cyan-400/20"
                       >
                         Edit
                       </button>
@@ -1006,14 +1027,14 @@ const CRDashboard = () => {
                           <button
                             type="button"
                             onClick={() => deleteCompilerVideo(video._id)}
-                            className="rounded-2xl bg-rose-500/20 px-4 py-2 text-sm text-rose-100"
+                            className="rounded-xl bg-rose-500/20 px-4 py-2 text-sm text-rose-100"
                           >
                             Confirm Delete
                           </button>
                           <button
                             type="button"
                             onClick={() => setVideoDeleteConfirm(null)}
-                            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
                           >
                             Cancel
                           </button>
@@ -1022,7 +1043,7 @@ const CRDashboard = () => {
                         <button
                           type="button"
                           onClick={() => setVideoDeleteConfirm(video._id)}
-                          className="rounded-2xl bg-rose-500/15 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-500/25"
+                          className="rounded-xl bg-rose-500/15 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-500/25"
                         >
                           Delete
                         </button>
@@ -1034,10 +1055,11 @@ const CRDashboard = () => {
             })}
 
             {compilerVideos.length === 0 && (
-              <div className="rounded-[1.75rem] border border-dashed border-white/10 bg-white/5 px-6 py-14 text-center text-white/45 xl:col-span-2">
+              <div className="rounded-[1.5rem] border border-dashed border-white/10 bg-white/5 px-6 py-14 text-center text-white/45 lg:col-span-2 2xl:col-span-3">
                 No 65 Compiler videos published yet.
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>

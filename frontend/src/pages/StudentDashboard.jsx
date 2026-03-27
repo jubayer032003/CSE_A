@@ -15,6 +15,7 @@ const StudentDashboard = () => {
   const [yearFilter, setYearFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [compilerTagFilter, setCompilerTagFilter] = useState("all");
+  const [showAllCompilerVideos, setShowAllCompilerVideos] = useState(false);
   const [expandedNotices, setExpandedNotices] = useState({});
   const [showAllNotices, setShowAllNotices] = useState(false);
   const [showNoticeDropdown, setShowNoticeDropdown] = useState(false);
@@ -145,6 +146,13 @@ const StudentDashboard = () => {
     const videoId = extractYouTubeVideoId(url);
     return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
   };
+  const getCompilerThumbnailUrl = (url) => {
+    const videoId = extractYouTubeVideoId(url);
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+  };
+  const visibleCompilerVideos = showAllCompilerVideos
+    ? filteredCompilerVideos
+    : filteredCompilerVideos.slice(0, 6);
 
   const toggleNoticeExpand = (noticeId) => {
     setExpandedNotices((prev) => ({
@@ -189,6 +197,10 @@ const StudentDashboard = () => {
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
+
+  useEffect(() => {
+    setShowAllCompilerVideos(false);
+  }, [compilerTagFilter]);
 
   const formatLastLogin = (loginAt) => {
     if (!loginAt) return "N/A";
@@ -1013,89 +1025,139 @@ const StudentDashboard = () => {
             </div>
           </Motion.div>
 
-          <div className="grid gap-6 xl:grid-cols-2">
-            {filteredCompilerVideos.map((video, index) => {
-              const embedUrl = getCompilerEmbedUrl(video.youtubeUrl);
-
-              return (
-                <Motion.article
-                  key={video._id}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.06 }}
-                  viewport={{ once: true }}
-                  className="overflow-hidden rounded-[1.75rem] border border-gray-700/60 bg-gradient-to-br from-gray-800/95 to-slate-900/95 shadow-xl"
-                >
-                  <div className="aspect-video w-full bg-black">
-                    {embedUrl ? (
-                      <iframe
-                        src={embedUrl}
-                        title={video.title}
-                        className="h-full w-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
+          {filteredCompilerVideos.length > 0 && (
+            <>
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-white">Featured lessons</p>
+                  <p className="text-xs text-gray-500">
+                    Showing {visibleCompilerVideos.length} of {filteredCompilerVideos.length} videos
+                  </p>
+                </div>
+                {filteredCompilerVideos.length > 6 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllCompilerVideos((prev) => !prev)}
+                    className="inline-flex items-center justify-center gap-2 self-start rounded-2xl border border-cyan-400/20 bg-white/5 px-4 py-2.5 text-sm font-medium text-cyan-100 transition hover:bg-white/10"
+                  >
+                    {showAllCompilerVideos ? "Show fewer videos" : "See more videos"}
+                    <svg
+                      className={`h-4 w-4 transition-transform ${showAllCompilerVideos ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
                       />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-sm text-gray-400">
-                        Invalid YouTube link
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {visibleCompilerVideos.map((video, index) => {
+                  const embedUrl = getCompilerEmbedUrl(video.youtubeUrl);
+                  const thumbnailUrl = getCompilerThumbnailUrl(video.youtubeUrl);
+
+                  return (
+                    <Motion.article
+                      key={video._id}
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: index * 0.05 }}
+                      viewport={{ once: true }}
+                      className="group overflow-hidden rounded-[1.75rem] border border-gray-700/60 bg-gradient-to-br from-gray-800/95 to-slate-900/95 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400/30"
+                    >
+                      <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
+                        {thumbnailUrl ? (
+                          <img
+                            src={thumbnailUrl}
+                            alt={video.title}
+                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          />
+                        ) : embedUrl ? (
+                          <iframe
+                            src={embedUrl}
+                            title={video.title}
+                            className="h-full w-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                            Invalid YouTube link
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                        <div className="absolute left-4 top-4 rounded-full border border-cyan-400/20 bg-black/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                          {video.subject}
+                        </div>
                       </div>
-                    )}
-                  </div>
 
-                  <div className="space-y-4 p-5 sm:p-6">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-                        {video.subject}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {video.createdAt
-                          ? new Date(video.createdAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
-                          : "Recently added"}
-                      </span>
-                    </div>
+                      <div className="space-y-4 p-5">
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="max-h-14 overflow-hidden text-lg font-semibold text-white">
+                            {video.title}
+                          </h3>
+                          <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-gray-400">
+                            #{index + 1}
+                          </span>
+                        </div>
 
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">
-                        {video.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-7 text-gray-300">
-                        {video.description || "A curated lesson from the 65 Compiler collection."}
-                      </p>
-                    </div>
+                        <p className="min-h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-300">
+                          {video.description || "A curated lesson from the 65 Compiler collection."}
+                        </p>
 
-                    <div className="flex flex-wrap gap-3">
-                      <a
-                        href={video.youtubeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-                      >
-                        Watch on YouTube
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => setCompilerTagFilter(video.subject)}
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
-                      >
-                        More {video.subject}
-                      </button>
-                    </div>
-                  </div>
-                </Motion.article>
-              );
-            })}
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                          <span>
+                            {video.createdAt
+                              ? new Date(video.createdAt).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })
+                              : "Recently added"}
+                          </span>
+                          <span className="h-1 w-1 rounded-full bg-gray-600"></span>
+                          <span>{video.subject}</span>
+                        </div>
 
-            {filteredCompilerVideos.length === 0 && (
+                        <div className="flex flex-wrap gap-3">
+                          <a
+                            href={video.youtubeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+                          >
+                            Watch now
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => setCompilerTagFilter(video.subject)}
+                            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+                          >
+                            {video.subject}
+                          </button>
+                        </div>
+                      </div>
+                    </Motion.article>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {filteredCompilerVideos.length === 0 && (
               <Motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 viewport={{ once: true }}
-                className="xl:col-span-2 rounded-[1.75rem] border border-dashed border-cyan-400/20 bg-cyan-500/5 px-6 py-14 text-center"
+                className="rounded-[1.75rem] border border-dashed border-cyan-400/20 bg-cyan-500/5 px-6 py-14 text-center"
               >
                 <p className="text-lg font-medium text-white">
                   No videos found for this subject yet
@@ -1112,7 +1174,6 @@ const StudentDashboard = () => {
                 </button>
               </Motion.div>
             )}
-          </div>
         </section>
 
         {/* Notes & Materials */}
