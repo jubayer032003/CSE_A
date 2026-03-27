@@ -9,6 +9,7 @@ const StudentDashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
   const [routine, setRoutine] = useState([]);
+  const [routineLoading, setRoutineLoading] = useState(true);
   const [notices, setNotices] = useState([]);
   const [notes, setNotes] = useState([]);
   const [compilerVideos, setCompilerVideos] = useState([]);
@@ -26,6 +27,7 @@ const StudentDashboard = () => {
     if (!user?.token) return;
 
     const fetchRoutine = async () => {
+      setRoutineLoading(true);
       try {
         const { data } = await axios.get("/api/routine", {
           headers: { Authorization: `Bearer ${user?.token}` },
@@ -33,6 +35,8 @@ const StudentDashboard = () => {
         setRoutine(data);
       } catch (error) {
         console.error("Error fetching routine:", error);
+      } finally {
+        setRoutineLoading(false);
       }
     };
 
@@ -64,10 +68,12 @@ const StudentDashboard = () => {
     };
 
     const initializeData = async () => {
-      await fetchRoutine();
-      await fetchNotices();
-      await fetchNotes();
-      await fetchCompilerVideos();
+      await Promise.allSettled([
+        fetchRoutine(),
+        fetchNotices(),
+        fetchNotes(),
+        fetchCompilerVideos(),
+      ]);
     };
 
     initializeData();
@@ -622,7 +628,21 @@ const StudentDashboard = () => {
                       </Motion.tr>
                     ))}
 
-                    {routine.length === 0 && (
+                    {routineLoading && (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12">
+                          <div className="flex flex-col items-center justify-center text-center">
+                            <div className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-indigo-500/30 border-t-indigo-400"></div>
+                            <p className="text-gray-300">Loading class routine...</p>
+                            <p className="mt-2 text-sm text-gray-500">
+                              Please wait a moment while we fetch the latest schedule.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+
+                    {!routineLoading && routine.length === 0 && (
                       <tr>
                         <td colSpan="4" className="px-6 py-12">
                           <div className="flex flex-col items-center justify-center text-center">
@@ -652,7 +672,7 @@ const StudentDashboard = () => {
                 </table>
               </div>
 
-              {routine.length > 0 && (
+              {!routineLoading && routine.length > 0 && (
                 <div className="px-6 py-3 bg-gray-800/30 border-t border-gray-700/60">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-500">
