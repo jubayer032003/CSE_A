@@ -11,8 +11,10 @@ const StudentDashboard = () => {
   const [routine, setRoutine] = useState([]);
   const [notices, setNotices] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [compilerVideos, setCompilerVideos] = useState([]);
   const [yearFilter, setYearFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
+  const [compilerTagFilter, setCompilerTagFilter] = useState("all");
   const [expandedNotices, setExpandedNotices] = useState({});
   const [showAllNotices, setShowAllNotices] = useState(false);
   const [showNoticeDropdown, setShowNoticeDropdown] = useState(false);
@@ -51,20 +53,32 @@ const StudentDashboard = () => {
       }
     };
 
+    const fetchCompilerVideos = async () => {
+      try {
+        const { data } = await axios.get("/api/compiler-videos");
+        setCompilerVideos(data);
+      } catch (error) {
+        console.error("Error fetching compiler videos:", error);
+      }
+    };
+
     const initializeData = async () => {
       await fetchRoutine();
       await fetchNotices();
       await fetchNotes();
+      await fetchCompilerVideos();
     };
 
     initializeData();
 
     socket.on("notice-updated", fetchNotices);
     socket.on("notes-updated", fetchNotes);
+    socket.on("compiler-videos-updated", fetchCompilerVideos);
 
     return () => {
       socket.off("notice-updated", fetchNotices);
       socket.off("notes-updated", fetchNotes);
+      socket.off("compiler-videos-updated", fetchCompilerVideos);
     };
   }, [user?.token]);
 
@@ -80,6 +94,57 @@ const StudentDashboard = () => {
   });
   const visibleNotices = showAllNotices ? sortedNotices : sortedNotices.slice(0, 3);
   const previewNotices = sortedNotices.slice(0, 3);
+  const compilerTags = [
+    "all",
+    ...Array.from(
+      new Set(
+        compilerVideos
+          .map((video) => video.subject?.trim())
+          .filter(Boolean),
+      ),
+    ),
+  ];
+  const filteredCompilerVideos = compilerVideos.filter((video) =>
+    compilerTagFilter === "all"
+      ? true
+      : video.subject?.toLowerCase() === compilerTagFilter.toLowerCase(),
+  );
+
+  const extractYouTubeVideoId = (url) => {
+    if (!url) return "";
+
+    try {
+      const parsedUrl = new URL(url);
+
+      if (parsedUrl.hostname === "youtu.be") {
+        return parsedUrl.pathname.slice(1);
+      }
+
+      if (parsedUrl.searchParams.get("v")) {
+        return parsedUrl.searchParams.get("v");
+      }
+
+      const segments = parsedUrl.pathname.split("/").filter(Boolean);
+      const embedIndex = segments.findIndex((segment) => segment === "embed");
+      if (embedIndex !== -1 && segments[embedIndex + 1]) {
+        return segments[embedIndex + 1];
+      }
+
+      const shortsIndex = segments.findIndex((segment) => segment === "shorts");
+      if (shortsIndex !== -1 && segments[shortsIndex + 1]) {
+        return segments[shortsIndex + 1];
+      }
+    } catch (error) {
+      return "";
+    }
+
+    return "";
+  };
+
+  const getCompilerEmbedUrl = (url) => {
+    const videoId = extractYouTubeVideoId(url);
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+  };
 
   const toggleNoticeExpand = (noticeId) => {
     setExpandedNotices((prev) => ({
@@ -878,6 +943,191 @@ const StudentDashboard = () => {
             )}
           </div>
         </section>
+        {/* 65 Compiler */}
+        <section className="mb-12">
+          <Motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="mb-6 overflow-hidden rounded-[2rem] border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-gray-900/95 to-slate-950"
+          >
+            <div className="grid gap-8 px-6 py-8 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/80">
+                  Sponsored By 65 Compiler
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+                  65 Compiler Learning Lounge
+                </h2>
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">
+                  Curated YouTube lessons from your CR for quick revision,
+                  concept clearing, and subject-focused practice. Filter by
+                  subject tag and jump straight into the right topic.
+                </p>
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {compilerTags.map((tag) => {
+                    const active = compilerTagFilter === tag;
+
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setCompilerTagFilter(tag)}
+                        className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                          active
+                            ? "border-cyan-300 bg-cyan-300 text-slate-950"
+                            : "border-cyan-400/20 bg-white/5 text-cyan-100 hover:bg-white/10"
+                        }`}
+                      >
+                        {tag === "all" ? "All Subjects" : tag}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">
+                    Videos
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-white">
+                    {filteredCompilerVideos.length}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-400">
+                    Matching the selected tag
+                  </p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">
+                    Tags
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-white">
+                    {Math.max(compilerTags.length - 1, 0)}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-400">
+                    Filterable subject categories
+                  </p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">
+                    Format
+                  </p>
+                  <p className="mt-3 text-xl font-semibold text-white">
+                    Responsive
+                  </p>
+                  <p className="mt-2 text-sm text-gray-400">
+                    Clean cards on desktop and mobile
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Motion.div>
+
+          <div className="grid gap-6 xl:grid-cols-2">
+            {filteredCompilerVideos.map((video, index) => {
+              const embedUrl = getCompilerEmbedUrl(video.youtubeUrl);
+
+              return (
+                <Motion.article
+                  key={video._id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.06 }}
+                  viewport={{ once: true }}
+                  className="overflow-hidden rounded-[1.75rem] border border-gray-700/60 bg-gradient-to-br from-gray-800/95 to-slate-900/95 shadow-xl"
+                >
+                  <div className="aspect-video w-full bg-black">
+                    {embedUrl ? (
+                      <iframe
+                        src={embedUrl}
+                        title={video.title}
+                        className="h-full w-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                        Invalid YouTube link
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 p-5 sm:p-6">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                        {video.subject}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {video.createdAt
+                          ? new Date(video.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "Recently added"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-semibold text-white">
+                        {video.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-7 text-gray-300">
+                        {video.description || "A curated lesson from the 65 Compiler collection."}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href={video.youtubeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+                      >
+                        Watch on YouTube
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setCompilerTagFilter(video.subject)}
+                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+                      >
+                        More {video.subject}
+                      </button>
+                    </div>
+                  </div>
+                </Motion.article>
+              );
+            })}
+
+            {filteredCompilerVideos.length === 0 && (
+              <Motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                viewport={{ once: true }}
+                className="xl:col-span-2 rounded-[1.75rem] border border-dashed border-cyan-400/20 bg-cyan-500/5 px-6 py-14 text-center"
+              >
+                <p className="text-lg font-medium text-white">
+                  No videos found for this subject yet
+                </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  Try another subject tag or check back after the CR adds more lessons.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setCompilerTagFilter("all")}
+                  className="mt-5 rounded-2xl border border-cyan-400/20 bg-white/5 px-4 py-2.5 text-sm font-medium text-cyan-100 transition hover:bg-white/10"
+                >
+                  Show all videos
+                </button>
+              </Motion.div>
+            )}
+          </div>
+        </section>
+
         {/* Notes & Materials */}
         <section>
           <Motion.div

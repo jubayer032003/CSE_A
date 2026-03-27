@@ -17,6 +17,7 @@ app.use("/api/auth", require("./routes/authRouters"));
 app.use("/api/routine", require("./routes/routineRoutes"));
 app.use("/api/notices", require("./routes/noticeRoutes"));
 app.use("/api/notes", require("./routes/noteRoutes"));
+app.use("/api/compiler-videos", require("./routes/compilerVideoRoutes"));
 
 // Socket.io setup
 const http = require("http");

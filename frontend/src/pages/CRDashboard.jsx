@@ -5,6 +5,42 @@ import ReactMarkdown from "react-markdown";
 import socket from "../socket";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
+const extractYouTubeVideoId = (url) => {
+  if (!url) return "";
+
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.hostname === "youtu.be") {
+      return parsedUrl.pathname.slice(1);
+    }
+
+    if (parsedUrl.searchParams.get("v")) {
+      return parsedUrl.searchParams.get("v");
+    }
+
+    const segments = parsedUrl.pathname.split("/").filter(Boolean);
+    const embedIndex = segments.findIndex((segment) => segment === "embed");
+    if (embedIndex !== -1 && segments[embedIndex + 1]) {
+      return segments[embedIndex + 1];
+    }
+
+    const shortsIndex = segments.findIndex((segment) => segment === "shorts");
+    if (shortsIndex !== -1 && segments[shortsIndex + 1]) {
+      return segments[shortsIndex + 1];
+    }
+  } catch (error) {
+    return "";
+  }
+
+  return "";
+};
+
+const getEmbedUrl = (url) => {
+  const videoId = extractYouTubeVideoId(url);
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+};
+
 const CRDashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
@@ -34,8 +70,17 @@ const CRDashboard = () => {
     teacher: "",
   });
   const [editId, setEditId] = useState(null);
+  const [compilerVideos, setCompilerVideos] = useState([]);
+  const [videoForm, setVideoForm] = useState({
+    title: "",
+    subject: "",
+    youtubeUrl: "",
+    description: "",
+  });
+  const [videoEditId, setVideoEditId] = useState(null);
   const [activeTab, setActiveTab] = useState("routine");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [videoDeleteConfirm, setVideoDeleteConfirm] = useState(null);
 
   // ===== ROUTINE =====
   const fetchRoutine = async () => {
@@ -134,7 +179,7 @@ const CRDashboard = () => {
   // Use useEffect for socket subscription only
   useEffect(() => {
     socket.on("notes-updated", fetchNotes);
-    return () => socket.off("notes-updated");
+    return () => socket.off("notes-updated", fetchNotes);
   }, [fetchNotes]);
 
   const submitHandler = async () => {
@@ -197,24 +242,98 @@ const CRDashboard = () => {
     setActiveTab("notes");
   };
 
+  // ===== 65 COMPILER VIDEOS =====
+  const fetchCompilerVideos = useCallback(async () => {
+    try {
+      const { data } = await axios.get("/api/compiler-videos");
+      setCompilerVideos(data);
+    } catch (error) {
+      console.error("Error fetching compiler videos:", error);
+    }
+  }, []);
+
+  const resetVideoForm = () => {
+    setVideoForm({
+      title: "",
+      subject: "",
+      youtubeUrl: "",
+      description: "",
+    });
+    setVideoEditId(null);
+  };
+
+  const submitCompilerVideo = async () => {
+    if (!videoForm.title || !videoForm.subject || !videoForm.youtubeUrl) {
+      alert("Title, subject, and YouTube link are required");
+      return;
+    }
+
+    try {
+      if (videoEditId) {
+        await axios.put(`/api/compiler-videos/${videoEditId}`, videoForm, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+      } else {
+        await axios.post("/api/compiler-videos", videoForm, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+      }
+
+      resetVideoForm();
+      fetchCompilerVideos();
+    } catch (error) {
+      console.error("Error submitting compiler video:", error);
+      alert(error.response?.data?.message || "Unable to save video");
+    }
+  };
+
+  const editCompilerVideo = (video) => {
+    setVideoForm({
+      title: video.title || "",
+      subject: video.subject || "",
+      youtubeUrl: video.youtubeUrl || "",
+      description: video.description || "",
+    });
+    setVideoEditId(video._id);
+    setActiveTab("compiler");
+  };
+
+  const deleteCompilerVideo = async (id) => {
+    try {
+      await axios.delete(`/api/compiler-videos/${id}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
+      setVideoDeleteConfirm(null);
+      if (videoEditId === id) {
+        resetVideoForm();
+      }
+      fetchCompilerVideos();
+    } catch (error) {
+      console.error("Error deleting compiler video:", error);
+      alert(error.response?.data?.message || "Unable to delete video");
+    }
+  };
+
   // Use a separate useEffect for initial data fetching
   useEffect(() => {
     let isMounted = true;
 
     const fetchInitialData = async () => {
       try {
-        const [routineData, noticesData, notesData] = await Promise.all([
+        const [routineData, noticesData, notesData, compilerVideosData] = await Promise.all([
           axios.get("/api/routine", {
             headers: { Authorization: `Bearer ${user?.token}` },
           }),
           axios.get("/api/notices"),
-          axios.get("/api/notes")
+          axios.get("/api/notes"),
+          axios.get("/api/compiler-videos"),
         ]);
 
         if (isMounted) {
           setRoutine(routineData.data);
           setNotices(noticesData.data);
           setNotes(notesData.data);
+          setCompilerVideos(compilerVideosData.data);
         }
       } catch (error) {
         console.error("Error fetching initial data:", error);
@@ -226,12 +345,14 @@ const CRDashboard = () => {
     }
 
     socket.on("notice-updated", fetchNotices);
+    socket.on("compiler-videos-updated", fetchCompilerVideos);
 
     return () => {
       isMounted = false;
-      socket.off("notice-updated");
+      socket.off("notice-updated", fetchNotices);
+      socket.off("compiler-videos-updated", fetchCompilerVideos);
     };
-  }, [user?.token, fetchNotices]);
+  }, [user?.token, fetchNotices, fetchCompilerVideos]);
 
   // Categories with colors
   const categories = {
@@ -747,6 +868,177 @@ const CRDashboard = () => {
               </div>
             </Motion.div>
           </Motion.div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+        <div className="rounded-[2rem] border border-cyan-400/20 bg-gradient-to-br from-cyan-500/10 via-slate-900/90 to-slate-950 p-6 shadow-2xl shadow-cyan-950/30">
+          <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-300/80">
+                Sponsored By 65 Compiler
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">
+                65 Compiler Video Manager
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm text-white/70">
+                CR can publish YouTube lessons with subject tags so students can
+                filter them from the student dashboard.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">
+              {compilerVideos.length} video{compilerVideos.length === 1 ? "" : "s"}
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <input
+              type="text"
+              placeholder="Video title"
+              value={videoForm.title}
+              onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
+              className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+            <input
+              type="text"
+              placeholder="Subject tag"
+              value={videoForm.subject}
+              onChange={(e) => setVideoForm({ ...videoForm, subject: e.target.value })}
+              className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+            <input
+              type="text"
+              placeholder="YouTube video link"
+              value={videoForm.youtubeUrl}
+              onChange={(e) => setVideoForm({ ...videoForm, youtubeUrl: e.target.value })}
+              className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-cyan-400 md:col-span-2"
+            />
+            <textarea
+              rows="4"
+              placeholder="Short description"
+              value={videoForm.description}
+              onChange={(e) => setVideoForm({ ...videoForm, description: e.target.value })}
+              className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-cyan-400 md:col-span-2"
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={submitCompilerVideo}
+              className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              {videoEditId ? "Update Video" : "Publish Video"}
+            </button>
+            {videoEditId && (
+              <button
+                type="button"
+                onClick={resetVideoForm}
+                className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
+
+          <div className="mt-8 grid gap-5 xl:grid-cols-2">
+            {compilerVideos.map((video) => {
+              const embedUrl = getEmbedUrl(video.youtubeUrl);
+
+              return (
+                <article
+                  key={video._id}
+                  className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5"
+                >
+                  <div className="aspect-video w-full bg-slate-950">
+                    {embedUrl ? (
+                      <iframe
+                        src={embedUrl}
+                        title={video.title}
+                        className="h-full w-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-white/45">
+                        Invalid YouTube link
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 p-5">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                        {video.subject}
+                      </span>
+                      <span className="text-xs text-white/40">
+                        {new Date(video.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{video.title}</h3>
+                      {video.description && (
+                        <p className="mt-2 text-sm leading-6 text-white/70">
+                          {video.description}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href={video.youtubeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10"
+                      >
+                        Open YouTube
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => editCompilerVideo(video)}
+                        className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100 transition hover:bg-cyan-400/20"
+                      >
+                        Edit
+                      </button>
+                      {videoDeleteConfirm === video._id ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => deleteCompilerVideo(video._id)}
+                            className="rounded-2xl bg-rose-500/20 px-4 py-2 text-sm text-rose-100"
+                          >
+                            Confirm Delete
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setVideoDeleteConfirm(null)}
+                            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setVideoDeleteConfirm(video._id)}
+                          className="rounded-2xl bg-rose-500/15 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-500/25"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+
+            {compilerVideos.length === 0 && (
+              <div className="rounded-[1.75rem] border border-dashed border-white/10 bg-white/5 px-6 py-14 text-center text-white/45 xl:col-span-2">
+                No 65 Compiler videos published yet.
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
