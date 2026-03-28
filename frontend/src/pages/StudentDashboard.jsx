@@ -17,6 +17,7 @@ const StudentDashboard = () => {
   const [semesterFilter, setSemesterFilter] = useState("all");
   const [compilerTagFilter, setCompilerTagFilter] = useState("all");
   const [showAllCompilerVideos, setShowAllCompilerVideos] = useState(false);
+  const [compilerInitialCount, setCompilerInitialCount] = useState(6);
   const [expandedNotices, setExpandedNotices] = useState({});
   const [showAllNotices, setShowAllNotices] = useState(false);
   const [showNoticeDropdown, setShowNoticeDropdown] = useState(false);
@@ -160,7 +161,7 @@ const StudentDashboard = () => {
   };
   const visibleCompilerVideos = showAllCompilerVideos
     ? filteredCompilerVideos
-    : filteredCompilerVideos.slice(0, 6);
+    : filteredCompilerVideos.slice(0, compilerInitialCount);
 
   const toggleNoticeExpand = (noticeId) => {
     setExpandedNotices((prev) => ({
@@ -209,6 +210,27 @@ const StudentDashboard = () => {
   useEffect(() => {
     setShowAllCompilerVideos(false);
   }, [compilerTagFilter]);
+
+  useEffect(() => {
+    const updateCompilerInitialCount = () => {
+      if (window.innerWidth < 640) {
+        setCompilerInitialCount(3);
+        return;
+      }
+
+      if (window.innerWidth < 1024) {
+        setCompilerInitialCount(4);
+        return;
+      }
+
+      setCompilerInitialCount(6);
+    };
+
+    updateCompilerInitialCount();
+    window.addEventListener("resize", updateCompilerInitialCount);
+
+    return () => window.removeEventListener("resize", updateCompilerInitialCount);
+  }, []);
 
   const formatLastLogin = (loginAt) => {
     if (!loginAt) return "N/A";
@@ -1056,7 +1078,7 @@ const StudentDashboard = () => {
                     Showing {visibleCompilerVideos.length} of {filteredCompilerVideos.length} videos
                   </p>
                 </div>
-                {filteredCompilerVideos.length > 6 && (
+                {filteredCompilerVideos.length > compilerInitialCount && (
                   <button
                     type="button"
                     onClick={() => setShowAllCompilerVideos((prev) => !prev)}
@@ -1080,7 +1102,7 @@ const StudentDashboard = () => {
                 )}
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {visibleCompilerVideos.map((video, index) => {
                   const embedUrl = getCompilerEmbedUrl(video.youtubeUrl);
                   const thumbnailUrl = getCompilerThumbnailUrl(video.youtubeUrl);
@@ -1092,9 +1114,9 @@ const StudentDashboard = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.35, delay: index * 0.05 }}
                       viewport={{ once: true }}
-                      className="group overflow-hidden rounded-[1.75rem] border border-gray-700/60 bg-gradient-to-br from-gray-800/95 to-slate-900/95 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400/30"
+                      className="group overflow-hidden rounded-[1.4rem] sm:rounded-[1.75rem] border border-gray-700/60 bg-gradient-to-br from-gray-800/95 to-slate-900/95 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400/30"
                     >
-                      <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
+                      <div className="relative aspect-[16/10] sm:aspect-video w-full overflow-hidden bg-slate-950">
                         {thumbnailUrl ? (
                           <img
                             src={thumbnailUrl}
@@ -1115,14 +1137,14 @@ const StudentDashboard = () => {
                           </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                        <div className="absolute left-4 top-4 rounded-full border border-cyan-400/20 bg-black/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                        <div className="absolute left-3 top-3 rounded-full border border-cyan-400/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-200 sm:left-4 sm:top-4 sm:px-3 sm:text-[11px]">
                           {video.subject}
                         </div>
                       </div>
 
-                      <div className="space-y-4 p-5">
+                      <div className="space-y-3 p-4 sm:space-y-4 sm:p-5">
                         <div className="flex items-start justify-between gap-3">
-                          <h3 className="max-h-14 overflow-hidden text-lg font-semibold text-white">
+                          <h3 className="max-h-12 overflow-hidden text-base font-semibold text-white sm:max-h-14 sm:text-lg">
                             {video.title}
                           </h3>
                           <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-gray-400">
@@ -1130,7 +1152,7 @@ const StudentDashboard = () => {
                           </span>
                         </div>
 
-                        <p className="min-h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-300">
+                        <p className="min-h-[3.75rem] max-h-[3.75rem] overflow-hidden text-sm leading-6 text-gray-300 sm:min-h-[4.5rem] sm:max-h-[4.5rem]">
                           {video.description || "A curated lesson from the 65 Compiler collection."}
                         </p>
 
@@ -1148,19 +1170,19 @@ const StudentDashboard = () => {
                           <span>{video.subject}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-2.5">
                           <a
                             href={video.youtubeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-3.5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
                           >
                             Watch now
                           </a>
                           <button
                             type="button"
                             onClick={() => setCompilerTagFilter(video.subject)}
-                            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+                            className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                           >
                             {video.subject}
                           </button>
