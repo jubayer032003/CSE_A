@@ -5,11 +5,28 @@ import ReactMarkdown from "react-markdown";
 import socket from "../socket";
 import { motion as Motion } from "framer-motion";
 
+const normalizeRoutineData = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.routine)) {
+    return payload.routine;
+  }
+
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+
+  return [];
+};
+
 const StudentDashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
   const [routine, setRoutine] = useState([]);
   const [routineLoading, setRoutineLoading] = useState(true);
+  const [routineError, setRoutineError] = useState("");
   const [notices, setNotices] = useState([]);
   const [notes, setNotes] = useState([]);
   const [compilerVideos, setCompilerVideos] = useState([]);
@@ -29,13 +46,20 @@ const StudentDashboard = () => {
 
     const fetchRoutine = async () => {
       setRoutineLoading(true);
+      setRoutineError("");
       try {
-        const { data } = await axios.get("/api/routine", {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
-        setRoutine(data);
+        const config = user?.token
+          ? { headers: { Authorization: `Bearer ${user.token}` } }
+          : undefined;
+        const { data } = await axios.get("/api/routine", config);
+        setRoutine(normalizeRoutineData(data));
       } catch (error) {
         console.error("Error fetching routine:", error);
+        setRoutine([]);
+        setRoutineError(
+          error.response?.data?.message ||
+            "We could not load the class routine right now. Please try again in a moment.",
+        );
       } finally {
         setRoutineLoading(false);
       }
@@ -666,7 +690,7 @@ const StudentDashboard = () => {
                       </tr>
                     )}
 
-                    {!routineLoading && routine.length === 0 && (
+                    {!routineLoading && !routineError && routine.length === 0 && (
                       <tr>
                         <td colSpan="4" className="px-6 py-12">
                           <div className="flex flex-col items-center justify-center text-center">
@@ -687,6 +711,36 @@ const StudentDashboard = () => {
                             </div>
                             <p className="text-gray-400">
                               No routine available.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+
+                    {!routineLoading && routineError && (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12">
+                          <div className="flex flex-col items-center justify-center text-center">
+                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10">
+                              <svg
+                                className="h-8 w-8 text-amber-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M12 9v3.75m0 3.75h.008v.008H12v-.008zm8.25-.75a8.25 8.25 0 11-16.5 0 8.25 8.25 0 0116.5 0z"
+                                />
+                              </svg>
+                            </div>
+                            <p className="text-base font-medium text-amber-100">
+                              Routine could not be loaded
+                            </p>
+                            <p className="mt-2 max-w-md text-sm text-amber-200/80">
+                              {routineError}
                             </p>
                           </div>
                         </td>

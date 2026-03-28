@@ -9,7 +9,7 @@ const {
 
 const { protect } = require("../middleware/authMiddleware");
 
-router.get("/", protect, getRoutine);
+router.get("/", getRoutine);
 router.post("/", protect, addRoutine);
 router.put("/:id", protect, updateRoutine);
 router.delete("/:id", protect, deleteRoutine);
