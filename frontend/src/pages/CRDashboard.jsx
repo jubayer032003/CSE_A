@@ -46,6 +46,22 @@ const getThumbnailUrl = (url) => {
   return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
 };
 
+const normalizeNoticeData = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.notices)) {
+    return payload.notices;
+  }
+
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+
+  return [];
+};
+
 const CRDashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
@@ -138,7 +154,7 @@ const CRDashboard = () => {
   const fetchNotices = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/notices");
-      setNotices(data);
+      setNotices(normalizeNoticeData(data));
     } catch (error) {
       console.error("Error fetching notices:", error);
     }
@@ -336,7 +352,7 @@ const CRDashboard = () => {
 
         if (isMounted) {
           setRoutine(routineData.data);
-          setNotices(noticesData.data);
+          setNotices(normalizeNoticeData(noticesData.data));
           setNotes(notesData.data);
           setCompilerVideos(compilerVideosData.data);
         }
@@ -365,6 +381,8 @@ const CRDashboard = () => {
     exam: { label: "Exam", bg: "bg-red-500/20", text: "text-red-400", border: "border-red-500/30" },
     event: { label: "Event", bg: "bg-green-500/20", text: "text-green-400", border: "border-green-500/30" },
     holiday: { label: "Holiday", bg: "bg-purple-500/20", text: "text-purple-400", border: "border-purple-500/30" },
+    class: { label: "Class", bg: "bg-cyan-500/20", text: "text-cyan-300", border: "border-cyan-500/30" },
+    urgent: { label: "Urgent", bg: "bg-rose-500/20", text: "text-rose-300", border: "border-rose-500/30" },
   };
 
   // Animation variants

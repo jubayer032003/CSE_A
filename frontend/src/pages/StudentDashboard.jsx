@@ -21,6 +21,97 @@ const normalizeRoutineData = (payload) => {
   return [];
 };
 
+const normalizeNoticeData = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.notices)) {
+    return payload.notices;
+  }
+
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+
+  return [];
+};
+
+const NOTICE_CATEGORY_META = {
+  general: {
+    label: "General",
+    accentBar: "bg-gradient-to-r from-indigo-500 to-purple-500",
+    iconWrap: "bg-indigo-500/10",
+    iconColor: "text-indigo-400",
+    badge: "bg-indigo-900/30 text-indigo-300 border border-indigo-700/50",
+    icon: (
+      <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+      </svg>
+    ),
+  },
+  exam: {
+    label: "Exam",
+    accentBar: "bg-gradient-to-r from-rose-500 to-orange-400",
+    iconWrap: "bg-rose-500/10",
+    iconColor: "text-rose-300",
+    badge: "bg-rose-900/30 text-rose-200 border border-rose-700/50",
+    icon: (
+      <svg className="w-4 h-4 text-rose-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
+      </svg>
+    ),
+  },
+  event: {
+    label: "Event",
+    accentBar: "bg-gradient-to-r from-emerald-500 to-teal-400",
+    iconWrap: "bg-emerald-500/10",
+    iconColor: "text-emerald-300",
+    badge: "bg-emerald-900/30 text-emerald-200 border border-emerald-700/50",
+    icon: (
+      <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  holiday: {
+    label: "Holiday",
+    accentBar: "bg-gradient-to-r from-fuchsia-500 to-violet-400",
+    iconWrap: "bg-fuchsia-500/10",
+    iconColor: "text-fuchsia-300",
+    badge: "bg-fuchsia-900/30 text-fuchsia-200 border border-fuchsia-700/50",
+    icon: (
+      <svg className="w-4 h-4 text-fuchsia-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m4-4H8m12 0A8 8 0 118 4a8 8 0 018 8z" />
+      </svg>
+    ),
+  },
+  class: {
+    label: "Class",
+    accentBar: "bg-gradient-to-r from-sky-500 to-cyan-400",
+    iconWrap: "bg-sky-500/10",
+    iconColor: "text-sky-300",
+    badge: "bg-sky-900/30 text-sky-200 border border-sky-700/50",
+    icon: (
+      <svg className="w-4 h-4 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422A12.083 12.083 0 0112 20.055 12.083 12.083 0 015.84 10.578L12 14zm0 0v6" />
+      </svg>
+    ),
+  },
+  urgent: {
+    label: "Urgent",
+    accentBar: "bg-gradient-to-r from-red-500 to-red-400",
+    iconWrap: "bg-red-500/10",
+    iconColor: "text-red-400",
+    badge: "bg-red-900/30 text-red-300 border border-red-700/50",
+    icon: (
+      <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    ),
+  },
+};
+
 const StudentDashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
@@ -68,7 +159,7 @@ const StudentDashboard = () => {
     const fetchNotices = async () => {
       try {
         const { data } = await axios.get("/api/notices");
-        setNotices(data);
+        setNotices(normalizeNoticeData(data));
       } catch (error) {
         console.error("Error fetching notices:", error);
       }
@@ -126,7 +217,7 @@ const StudentDashboard = () => {
     const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return dateB - dateA;
   });
-  const visibleNotices = showAllNotices ? sortedNotices : sortedNotices.slice(0, 3);
+  const visibleNotices = showAllNotices ? sortedNotices : sortedNotices.slice(0, 5);
   const previewNotices = sortedNotices.slice(0, 3);
   const compilerTags = [
     "all",
@@ -795,6 +886,9 @@ const StudentDashboard = () => {
           <div className="space-y-4">
             {visibleNotices.map((n, index) => {
               const isExpanded = Boolean(expandedNotices[n._id]);
+              const categoryMeta =
+                NOTICE_CATEGORY_META[n.category?.toLowerCase()] ||
+                NOTICE_CATEGORY_META.general;
 
               return (
                 <Motion.div
@@ -811,70 +905,24 @@ const StudentDashboard = () => {
 
                 <div className="relative bg-gradient-to-br from-gray-800/90 to-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/60 hover:border-indigo-500/50 transition-all duration-200 shadow-lg">
                   {/* Top accent bar */}
-                  <div
-                    className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${
-                      n.category === "urgent"
-                        ? "bg-gradient-to-r from-red-500 to-red-400"
-                        : "bg-gradient-to-r from-indigo-500 to-purple-500"
-                    }`}
-                  ></div>
+                  <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${categoryMeta.accentBar}`}></div>
 
                   {/* Header with title and category */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div className="flex items-start gap-3">
                       {/* Icon based on category */}
-                      <div
-                        className={`flex-shrink-0 w-8 h-8 rounded-lg ${
-                          n.category === "urgent"
-                            ? "bg-red-500/10"
-                            : "bg-indigo-500/10"
-                        } flex items-center justify-center`}
-                      >
-                        {n.category === "urgent" ? (
-                          <svg
-                            className="w-4 h-4 text-red-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-4 h-4 text-indigo-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                            />
-                          </svg>
-                        )}
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${categoryMeta.iconWrap} flex items-center justify-center`}>
+                        {categoryMeta.icon}
                       </div>
 
                       <h3 className="text-lg font-semibold text-white group-hover:text-indigo-300 transition-colors">
-                        {n.title}
+                        {n.title || "Untitled Notice"}
                       </h3>
                     </div>
 
                     <div className="flex items-center gap-2 self-start sm:self-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                          n.category === "urgent"
-                            ? "bg-red-900/30 text-red-300 border border-red-700/50"
-                            : "bg-indigo-900/30 text-indigo-300 border border-indigo-700/50"
-                        }`}
-                      >
-                        {n.category?.toUpperCase() || "GENERAL"}
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${categoryMeta.badge}`}>
+                        {categoryMeta.label}
                       </span>
                     </div>
                   </div>
@@ -887,7 +935,7 @@ const StudentDashboard = () => {
                     }`}
                   >
                     <div className="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed">
-                      <ReactMarkdown>{n.content}</ReactMarkdown>
+                      <ReactMarkdown>{n.content || "No details were added for this notice."}</ReactMarkdown>
                     </div>
                   </div>
 
