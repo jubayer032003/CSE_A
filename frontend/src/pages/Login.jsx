@@ -368,7 +368,7 @@ const Login = () => {
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.5 }}
-              className="relative w-full md:w-2/5 bg-gradient-to-br from-slate-950/90 via-indigo-950/70 to-slate-950/90 p-6 sm:p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 overflow-hidden"
+              className="relative hidden w-full md:flex md:w-2/5 flex-col justify-center overflow-hidden border-b border-white/5 bg-gradient-to-br from-slate-950/90 via-indigo-950/70 to-slate-950/90 p-6 sm:p-8 md:border-b-0 md:border-r"
             >
               {/* Background binary rain */}
               <div className="absolute inset-0 opacity-10 font-mono text-green-400 text-xs pointer-events-none">
