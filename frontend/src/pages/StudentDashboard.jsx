@@ -155,6 +155,11 @@ const formatLastLogin = (loginAt) => {
   return `${dayText} ${timeText}`;
 };
 
+const formatDuration = (milliseconds) => {
+  if (!milliseconds || Number.isNaN(milliseconds)) return "0s";
+  return `${Math.max(1, Math.round(milliseconds / 1000))}s`;
+};
+
 // ===== Class Representatives Data =====
 const classReps = [
   { id: 1, name: "Arfan Chowdhury", email: "261-115-001", phone: "+880 1704 259571" },
@@ -359,6 +364,73 @@ const StudentDashboard = () => {
     });
   }, []);
 
+  const collectLiveLocationSamples = useCallback((policy = {}) => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported on this device."));
+        return;
+      }
+
+      const samplesRequired = Number(policy.samplesRequired) || 4;
+      const minDurationMs = Number(policy.minDurationMs) || 12000;
+      const samples = [];
+      const startedAt = Date.now();
+      let settled = false;
+
+      const finish = (callback, value) => {
+        if (settled) return;
+        settled = true;
+        navigator.geolocation.clearWatch(watchId);
+        window.clearTimeout(forceTimeoutId);
+        callback(value);
+      };
+
+      const maybeResolve = () => {
+        const durationMs = Date.now() - startedAt;
+        if (samples.length >= samplesRequired && durationMs >= minDurationMs) {
+          finish(resolve, samples);
+        }
+      };
+
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude, accuracy } = position.coords;
+          samples.push({
+            latitude,
+            longitude,
+            accuracy,
+            recordedAt: position.timestamp || Date.now(),
+            label: `Lat ${latitude.toFixed(5)}, Lng ${longitude.toFixed(5)}`,
+          });
+          maybeResolve();
+        },
+        (error) => {
+          finish(
+            reject,
+            new Error(error?.message || "Could not read your live location."),
+          );
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
+        },
+      );
+
+      const forceTimeoutId = window.setTimeout(() => {
+        if (samples.length >= samplesRequired) {
+          finish(resolve, samples);
+          return;
+        }
+
+        finish(
+          reject,
+          new Error("We could not collect enough live GPS samples. Please stay outdoors and try again."),
+        );
+      }, Math.max(minDurationMs + 18000, 25000));
+    });
+  }, []);
+
 
 const mobileOverviewStats = useMemo(() => ([
     {
@@ -400,11 +472,54 @@ const mobileOverviewStats = useMemo(() => ([
     setAttendanceSubmittingId(sessionId);
 
     try {
-      const position = await getCurrentPosition();
-      const { latitude, longitude, accuracy } = position.coords;
+      const targetSession = attendanceData.activeSessions.find((session) => session._id === sessionId);
+      const livePolicy = targetSession?.liveVerificationPolicy || {};
+
+      setAttendanceMessage("Starting live location verification...");
+      const { data: liveStartData } = await axios.post(
+        `/api/attendance/student/${sessionId}/live/start`,
+        {},
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+
+      const verification = liveStartData?.verification || {};
+      const policy = verification?.policy || livePolicy;
+
+      setAttendanceMessage(
+        `Collecting live GPS for about ${formatDuration(policy.minDurationMs)}. Keep this page open and stay near campus.`
+      );
+
+      const samples = await collectLiveLocationSamples(policy);
+
+      let permissionState = "";
+      if (navigator.permissions?.query) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: "geolocation" });
+          permissionState = permissionStatus?.state || "";
+        } catch {
+          permissionState = "";
+        }
+      }
+
+      const latestPosition = samples[samples.length - 1] || (await getCurrentPosition()).coords;
       const { data } = await axios.post(
         `/api/attendance/student/${sessionId}/submit`,
-        { latitude, longitude, accuracy, label: `Lat ${latitude.toFixed(5)}, Lng ${longitude.toFixed(5)}` },
+        {
+          challengeId: verification.challengeId,
+          challengeToken: verification.challengeToken,
+          samples,
+          deviceInfo: {
+            permissionState,
+            pageVisible: document.visibilityState === "visible",
+            pageFocused: document.hasFocus(),
+            secureContext: window.isSecureContext,
+            platform: navigator.platform || "",
+            userAgent: navigator.userAgent || "",
+          },
+          latitude: latestPosition?.latitude,
+          longitude: latestPosition?.longitude,
+          accuracy: latestPosition?.accuracy,
+        },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
 
@@ -413,14 +528,14 @@ const mobileOverviewStats = useMemo(() => ([
         recentSessions: [data.session, ...prev.recentSessions.filter((s) => s._id !== sessionId)].slice(0, 8),
       }));
 
-      setAttendanceMessage("Attendance submitted successfully with your current location.");
+      setAttendanceMessage("Attendance submitted after live location verification.");
       setAttendancePopupSession(null);
     } catch (error) {
       setAttendanceMessage(error.response?.data?.message || error.message || "Attendance submission failed. Please allow location access and try again.");
     } finally {
       setAttendanceSubmittingId("");
     }
-  }, [user?.token, getCurrentPosition]);
+  }, [attendanceData.activeSessions, user?.token, collectLiveLocationSamples, getCurrentPosition]);
 
   const closeAttendancePopup = useCallback(() => {
     if (attendancePopupSession?._id) {
@@ -1908,18 +2023,18 @@ const mobileOverviewStats = useMemo(() => ([
           >
             Attendance has started
           </motion.h2>
-          <motion.p 
-            className="mt-3 text-sm leading-6 text-slate-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
-          >
+            <motion.p 
+              className="mt-3 text-sm leading-6 text-slate-300"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.25 }}
+            >
             {attendancePopupSession.teacher?.name || attendancePopupSession.teacherName || "Your teacher"} started{" "}
             <span className="font-bold text-transparent bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text">
               {attendancePopupSession.title}
             </span>
-            .
-          </motion.p>
+              . Live location will run for a few seconds before submission.
+            </motion.p>
 
           <motion.div 
             className="mt-5 rounded-xl border-2 border-emerald-400/30 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 p-4 backdrop-blur-sm"
@@ -2004,7 +2119,7 @@ const mobileOverviewStats = useMemo(() => ([
                     >
                       ✓
                     </motion.span>
-                    Submit Attendance
+                     Verify Live Location
                   </>
                 )}
               </span>
@@ -2936,7 +3051,7 @@ const mobileOverviewStats = useMemo(() => ([
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-bold text-white lg:text-xl">Available now</h3>
-              <p className="mt-1 hidden text-sm text-slate-400 lg:block">Submit once per attendance session while it is active.</p>
+              <p className="mt-1 hidden text-sm text-slate-400 lg:block">Each session now requires short live GPS verification before your attendance is accepted.</p>
             </div>
             {attendanceLoading && (
               <div
@@ -3021,7 +3136,7 @@ const mobileOverviewStats = useMemo(() => ([
                             >
                               📝
                             </span>
-                            Submit Attendance
+                            Verify Live Location
                           </>
                         )}
                       </span>

@@ -52,6 +52,7 @@ const getSubmissionFlagSummary = (entry) => {
   const issues = [];
   if (entry?.flags?.riskyIp) issues.push("Suspicious IP");
   if (entry?.flags?.unusualLocation) issues.push("Unusual location");
+  if (entry?.flags?.weakVerification) issues.push("Weak live proof");
   return issues.length ? issues.join(" + ") : "Clear";
 };
 
@@ -1823,6 +1824,15 @@ const TeacherDashboard = () => {
                                   {entry.location.unusualDistanceDetected
                                     ? `⚠️ Unusual distance: ${formatDistance(entry.location.distanceFromCampusMeters)}`
                                     : `📏 Straight-line: ${formatDistance(entry.location.distanceFromCampusMeters)}`}
+                                </div>
+                              )}
+                              {entry.verification && (
+                                <div className="mt-2 text-xs text-slate-400">
+                                  Live proof: {entry.verification.sampleCount || 0} samples in{" "}
+                                  {Math.max(1, Math.round((entry.verification.verificationDurationMs || 0) / 1000))}s
+                                  {typeof entry.verification.averageAccuracyMeters === "number"
+                                    ? ` • Avg GPS accuracy ${Math.round(entry.verification.averageAccuracyMeters)} m`
+                                    : ""}
                                 </div>
                               )}
                               {typeof entry.location?.latitude === "number" &&
