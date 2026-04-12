@@ -684,6 +684,45 @@ const closeAttendanceSession = async (req, res) => {
   }
 };
 
+const deleteAttendanceSession = async (req, res) => {
+  try {
+    if (!ensureTeacher(req, res)) return;
+
+    const session = await AttendanceSession.findOne({
+      _id: req.params.id,
+      teacher: req.user._id,
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: "Attendance session not found" });
+    }
+
+    if (session.status === "active") {
+      return res.status(400).json({
+        message: "Close the attendance session before deleting it.",
+      });
+    }
+
+    const response = buildAttendanceResponse(session, req.user._id, {
+      includeMarksSheet: true,
+    });
+
+    await AttendanceSession.deleteOne({ _id: session._id });
+
+    global.io?.emit("attendance-updated", {
+      type: "deleted",
+      session: response,
+    });
+
+    return res.json({
+      message: "Attendance session deleted successfully",
+      session: response,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const getStudentAttendanceDashboard = async (req, res) => {
   try {
     if (!ensureStudent(req, res)) return;
@@ -1073,6 +1112,7 @@ module.exports = {
   getTeacherAttendanceDashboard,
   startAttendanceSession,
   closeAttendanceSession,
+  deleteAttendanceSession,
   getStudentAttendanceDashboard,
   startLiveAttendanceVerification,
   submitAttendance,

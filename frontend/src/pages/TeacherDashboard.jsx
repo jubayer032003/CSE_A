@@ -575,6 +575,45 @@ const TeacherDashboard = () => {
     }
   };
 
+  const handleDeleteAttendanceSession = async (sessionId) => {
+    if (!sessionId) return;
+    const targetSession = availableSessions.find((session) => session._id === sessionId);
+    if (!targetSession) return;
+
+    const confirmed = window.confirm(
+      `Delete "${targetSession.title}" from session history? This cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setActionLoading(`delete-session-${sessionId}`);
+    setFeedback("");
+
+    try {
+      const { data } = await axios.delete(`/api/attendance/teacher/${sessionId}`, authConfig);
+
+      setDashboardData((prev) => ({
+        activeSession:
+          prev.activeSession?._id === sessionId ? null : prev.activeSession,
+        recentSessions: prev.recentSessions.filter((session) => session._id !== sessionId),
+      }));
+
+      if (marksSessionId === sessionId) {
+        setMarksSessionId("");
+      }
+      if (selectedAttendanceSessionId === sessionId) {
+        setSelectedAttendanceSessionId("");
+      }
+
+      setFeedback(data?.message || "Attendance session deleted successfully.");
+    } catch (error) {
+      setFeedback(
+        error.response?.data?.message || "Could not delete this attendance session right now.",
+      );
+    } finally {
+      setActionLoading("");
+    }
+  };
+
   const availableSessions = useMemo(
     () => uniqueSessions(dashboardData.activeSession, dashboardData.recentSessions),
     [dashboardData.activeSession, dashboardData.recentSessions],
@@ -1308,7 +1347,7 @@ const TeacherDashboard = () => {
                       <AnimatePresence>
                         {dashboardData.recentSessions.length > 0 ? (
                           dashboardData.recentSessions.map((session, index) => (
-                            <Motion.button
+                            <Motion.div
                               key={session._id}
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1316,19 +1355,34 @@ const TeacherDashboard = () => {
                               exit={{ opacity: 0, x: -10 }}
                               whileHover={{ scale: 1.01 }}
                               whileTap={{ scale: 0.99 }}
-                              type="button"
                               onClick={() => {
                                 handleSelectAttendanceSession(session._id);
                                 handleSelectMarksSession(session._id);
                               }}
-                              className={`group relative w-full overflow-hidden rounded-[1.35rem] p-4 text-left transition ${
+                              className={`group relative w-full cursor-pointer overflow-hidden rounded-[1.35rem] p-4 text-left transition ${
                                 selectedMarksSession?._id === session._id
                                   ? "border border-teal-400/40 bg-teal-400/12 ring-2 ring-teal-400/30"
                                   : "border border-white/8 bg-white/[0.04] hover:border-teal-300/20 hover:bg-white/[0.07]"
                               }`}
                             >
                               <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-emerald-400 via-teal-300 to-cyan-300 opacity-80" />
-                              <div className="flex items-start justify-between gap-2">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDeleteAttendanceSession(session._id);
+                                }}
+                                disabled={session.status === "active" || actionLoading === `delete-session-${session._id}`}
+                                className="absolute right-3 top-3 z-10 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                title={
+                                  session.status === "active"
+                                    ? "Close this session before deleting it"
+                                    : "Delete session"
+                                }
+                              >
+                                {actionLoading === `delete-session-${session._id}` ? "Deleting..." : "Delete"}
+                              </button>
+                              <div className="pr-24 flex items-start justify-between gap-2">
                                 <div className="flex-1">
                                   <p className="text-sm font-semibold text-white">{session.title}</p>
                                   <p className="mt-1 text-xs text-slate-400">
@@ -1683,7 +1737,7 @@ const TeacherDashboard = () => {
                               className="rounded-xl border border-slate-600 bg-slate-900/80 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-800"
                             >
                               Close Sheet
-                            </Motion.button>
+                            </Motion.div>
                             <Motion.button
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
@@ -1693,7 +1747,7 @@ const TeacherDashboard = () => {
                               className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {actionLoading === "saveExam" ? "Saving..." : "Save Spreadsheet"}
-                            </Motion.button>
+                            </Motion.div>
                             <Motion.button
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}

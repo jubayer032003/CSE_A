@@ -11,6 +11,11 @@ const teachers = [
     email: "teacher@metrouni.edu.bd",
     role: "teacher",
   },
+  {
+    name: "Invited Teacher",
+    email: "farhanaakter@metrouni.edu.bd",
+    role: "teacher",
+  }
 ];
 
 const seedTeachers = async () => {
