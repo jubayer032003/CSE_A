@@ -1555,7 +1555,7 @@ const mobileOverviewStats = useMemo(() => ([
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-6"
+      className="fixed inset-0 z-[80] flex items-end justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-4 sm:py-6"
       style={{
         background: "radial-gradient(circle at center, rgba(37,99,235,0.15) 0%, rgba(0,0,0,0.85) 100%)",
         backdropFilter: "blur(12px)",
@@ -1570,7 +1570,7 @@ const mobileOverviewStats = useMemo(() => ([
           stiffness: 400,
           damping: 25
         }}
-        className={`relative w-full max-w-lg overflow-hidden rounded-2xl shadow-2xl ${themeClasses.modal} ${themeClasses.border} backdrop-blur-xl`}
+        className={`relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] shadow-2xl ${themeClasses.modal} ${themeClasses.border} backdrop-blur-xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl`}
       >
         {/* Animated gradient background */}
         <motion.div
@@ -1645,7 +1645,7 @@ const mobileOverviewStats = useMemo(() => ([
 
         <form onSubmit={handleProfileSubmit} className="relative p-5 sm:p-6">
           <motion.div 
-            className="flex items-center gap-4"
+            className="flex flex-col items-start gap-4 sm:flex-row sm:items-center"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -1908,7 +1908,7 @@ const mobileOverviewStats = useMemo(() => ([
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[70] flex items-center justify-center px-4 py-6"
+      className="fixed inset-0 z-[70] flex items-end justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-4 sm:py-6"
       style={{
         background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0.85) 100%)",
         backdropFilter: "blur(12px)",
@@ -1923,7 +1923,7 @@ const mobileOverviewStats = useMemo(() => ([
           stiffness: 400,
           damping: 25
         }}
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border-2 border-emerald-400/30 shadow-2xl shadow-emerald-950/40"
+        className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] border-2 border-emerald-400/30 shadow-2xl shadow-emerald-950/40 sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl"
       >
         {/* Animated emerald gradient background */}
         <motion.div

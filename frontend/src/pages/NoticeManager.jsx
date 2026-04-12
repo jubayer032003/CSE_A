@@ -99,8 +99,8 @@ const NoticeManager = () => {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-96">
+        <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 p-3 sm:items-center sm:p-4">
+          <div className="w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-2xl bg-white p-4 shadow-lg sm:max-h-[calc(100dvh-3rem)] sm:p-6">
             <h2 className="text-xl mb-4">
               {editing ? "Edit Notice" : "Add Notice"}
             </h2>
@@ -123,17 +123,17 @@ const NoticeManager = () => {
               }
             />
 
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className="mt-4 flex flex-col-reverse justify-end gap-2 sm:flex-row">
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-3 py-1"
+                className="w-full px-3 py-2 sm:w-auto"
               >
                 Cancel
               </button>
 
               <button
                 onClick={saveNotice}
-                className="bg-blue-600 text-white px-3 py-1 rounded"
+                className="w-full rounded bg-blue-600 px-3 py-2 text-white sm:w-auto"
               >
                 Save
               </button>

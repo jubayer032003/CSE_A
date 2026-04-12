@@ -1757,14 +1757,14 @@ const TeacherDashboard = () => {
                               className="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-950/50 transition hover:from-emerald-600 hover:to-green-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {actionLoading === "publish" ? "Publishing..." : "Publish Results"}
-                            </Motion.div>
+                            </Motion.button>
                           </div>
                         </div>
                             </Motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-                            </Motion.button>
+            </Motion.div>
             )}
           </AnimatePresence>
         </Motion.section>
@@ -1946,7 +1946,7 @@ const TeacherDashboard = () => {
                 <p className="mt-2 text-sm text-slate-400">
                   Keep this page open. New submissions will appear here automatically.
                 </p>
-                            </Motion.button>
+              </Motion.div>
             )
           ) : (
             <Motion.div
@@ -1958,7 +1958,7 @@ const TeacherDashboard = () => {
               <p className="mt-2 text-sm text-slate-400">
                 Once attendance is active, this table will populate with student details.
               </p>
-                            </Motion.button>
+            </Motion.div>
           )}
         </Motion.section>
           </div>
@@ -1971,7 +1971,7 @@ const TeacherDashboard = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[80] flex items-center justify-center px-4 py-6"
+          className="fixed inset-0 z-[80] flex items-end justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-4 sm:py-6"
           style={{
             background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0.85) 100%)",
             backdropFilter: "blur(12px)",
@@ -1986,7 +1986,7 @@ const TeacherDashboard = () => {
               stiffness: 400,
               damping: 25
             }}
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl border border-emerald-200/30 backdrop-blur-xl"
+            className="relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] bg-white shadow-2xl border border-emerald-200/30 backdrop-blur-xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl"
           >
             {/* Animated gradient background */}
             <Motion.div
@@ -2034,7 +2034,7 @@ const TeacherDashboard = () => {
 
             <form onSubmit={handleProfileSubmit} className="relative p-5 sm:p-6">
               <Motion.div 
-                className="flex items-center gap-4"
+                className="flex flex-col items-start gap-4 sm:flex-row sm:items-center"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}

@@ -552,8 +552,8 @@ const CRDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {attendancePopupSession ? (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/65 px-4 py-6 backdrop-blur-sm">
-          <div className="relative w-full max-w-md overflow-hidden rounded-lg border border-emerald-300/25 bg-slate-950 shadow-2xl shadow-emerald-950/30">
+        <div className="fixed inset-0 z-[70] flex items-end justify-center overflow-y-auto bg-black/65 px-3 py-3 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6">
+          <div className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.5rem] border border-emerald-300/25 bg-slate-950 shadow-2xl shadow-emerald-950/30 sm:max-h-[calc(100dvh-3rem)] sm:rounded-lg">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-300 via-cyan-300 to-sky-300" />
             <button
               type="button"
@@ -1385,7 +1385,7 @@ const CRDashboard = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:items-center sm:p-4"
             onClick={() => setNoticeModal(false)}
           >
             <Motion.div
@@ -1393,7 +1393,7 @@ const CRDashboard = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-2xl p-8 max-w-md w-full border border-white/10 shadow-2xl"
+              className="w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-purple-900 to-indigo-900 p-5 shadow-2xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-2xl font-bold text-white mb-6">Add New Notice</h3>
@@ -1425,12 +1425,12 @@ const CRDashboard = () => {
                 rows="5"
               />
               
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
                 <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setNoticeModal(false)}
-                  className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-300"
+                  className="w-full rounded-xl bg-white/10 px-4 py-2 text-white transition-all duration-300 hover:bg-white/20 sm:w-auto"
                 >
                   Cancel
                 </Motion.button>
@@ -1438,7 +1438,7 @@ const CRDashboard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={addNotice}
-                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-green-600/30"
+                  className="w-full rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2 font-medium text-white transition-all duration-300 shadow-lg shadow-green-600/30 hover:from-green-700 hover:to-emerald-700 sm:w-auto"
                 >
                   Add Notice
                 </Motion.button>
