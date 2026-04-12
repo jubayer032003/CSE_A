@@ -15,6 +15,8 @@ const sanitizeUser = (user) => ({
   bio: user.bio || "",
 });
 
+const buildTeacherStudentId = (email) => `teacher:${String(email || "").trim().toLowerCase()}`;
+
 const findInvitedTeacherByEmail = (email) =>
   invitedTeachers.find(
     (teacher) =>
@@ -27,7 +29,13 @@ const ensureTeacherInviteRecord = async (email) => {
   if (!normalizedEmail) return null;
 
   let teacher = await User.findOne({ email: normalizedEmail, role: "teacher" });
-  if (teacher) return teacher;
+  if (teacher) {
+    if (!teacher.studentId) {
+      teacher.studentId = buildTeacherStudentId(normalizedEmail);
+      await teacher.save();
+    }
+    return teacher;
+  }
 
   const invitedTeacher = findInvitedTeacherByEmail(normalizedEmail);
   if (!invitedTeacher) return null;
@@ -36,6 +44,7 @@ const ensureTeacherInviteRecord = async (email) => {
     name: invitedTeacher.name,
     email: normalizedEmail,
     role: "teacher",
+    studentId: buildTeacherStudentId(normalizedEmail),
   });
 
   return teacher;

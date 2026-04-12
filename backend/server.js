@@ -20,17 +20,26 @@ app.use(cors());
 const ensureInvitedTeachers = async () => {
   try {
     for (const teacher of invitedTeachers) {
+      const normalizedEmail = teacher.email.toLowerCase();
+      const teacherStudentId = `teacher:${normalizedEmail}`;
       const existingTeacher = await User.findOne({
-        email: teacher.email.toLowerCase(),
+        email: normalizedEmail,
         role: "teacher",
       });
 
-      if (existingTeacher) continue;
+      if (existingTeacher) {
+        if (!existingTeacher.studentId) {
+          existingTeacher.studentId = teacherStudentId;
+          await existingTeacher.save();
+        }
+        continue;
+      }
 
       await User.create({
         name: teacher.name,
-        email: teacher.email.toLowerCase(),
+        email: normalizedEmail,
         role: "teacher",
+        studentId: teacherStudentId,
       });
 
       console.log(`Ensured invited teacher: ${teacher.email}`);
