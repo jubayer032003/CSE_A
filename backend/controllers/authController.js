@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { invitedTeachers } = require("../config/invitedTeachers");
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
@@ -13,6 +14,32 @@ const sanitizeUser = (user) => ({
   profilePic: user.profilePic || "",
   bio: user.bio || "",
 });
+
+const findInvitedTeacherByEmail = (email) =>
+  invitedTeachers.find(
+    (teacher) =>
+      String(teacher.email || "").trim().toLowerCase() ===
+      String(email || "").trim().toLowerCase(),
+  ) || null;
+
+const ensureTeacherInviteRecord = async (email) => {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) return null;
+
+  let teacher = await User.findOne({ email: normalizedEmail, role: "teacher" });
+  if (teacher) return teacher;
+
+  const invitedTeacher = findInvitedTeacherByEmail(normalizedEmail);
+  if (!invitedTeacher) return null;
+
+  teacher = await User.create({
+    name: invitedTeacher.name,
+    email: normalizedEmail,
+    role: "teacher",
+  });
+
+  return teacher;
+};
 
 const updateProfile = async (req, res) => {
   try {
@@ -83,7 +110,7 @@ const checkTeacherEmail = async (req, res) => {
       return res.status(400).json({ message: "Teacher email is required" });
     }
 
-    const teacher = await User.findOne({ email, role: "teacher" });
+    const teacher = await ensureTeacherInviteRecord(email);
 
     if (!teacher) {
       return res.json({
@@ -124,7 +151,7 @@ const registerUser = async (req, res) => {
     }
 
     if (role === "teacher") {
-      const invitedTeacher = await User.findOne({ email, role: "teacher" });
+      const invitedTeacher = await ensureTeacherInviteRecord(email);
       if (!invitedTeacher) {
         return res.status(404).json({
           message: "Teacher email was not found in the invited list",
@@ -204,7 +231,7 @@ const loginUser = async (req, res) => {
         return res.status(400).json({ message: "Provide teacher email and password" });
       }
 
-      user = await User.findOne({ email, role: "teacher" });
+      user = await ensureTeacherInviteRecord(email);
 
       if (!user) {
         return res.status(401).json({ message: "Teacher account not found" });
