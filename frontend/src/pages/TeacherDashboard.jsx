@@ -1407,7 +1407,7 @@ const TeacherDashboard = () => {
                                   {session.marksSheet?.publishedAt ? "✓ Marks" : "○ Pending"}
                                 </span>
                               </div>
-                            </Motion.button>
+                            </Motion.div>
                           ))
                         ) : (
                           <Motion.div
@@ -1737,7 +1737,7 @@ const TeacherDashboard = () => {
                               className="rounded-xl border border-slate-600 bg-slate-900/80 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-800"
                             >
                               Close Sheet
-                            </Motion.div>
+                            </Motion.button>
                             <Motion.button
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
@@ -1747,7 +1747,7 @@ const TeacherDashboard = () => {
                               className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {actionLoading === "saveExam" ? "Saving..." : "Save Spreadsheet"}
-                            </Motion.div>
+                            </Motion.button>
                             <Motion.button
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
@@ -1757,14 +1757,14 @@ const TeacherDashboard = () => {
                               className="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-950/50 transition hover:from-emerald-600 hover:to-green-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {actionLoading === "publish" ? "Publishing..." : "Publish Results"}
-                            </Motion.button>
+                            </Motion.div>
                           </div>
                         </div>
-                      </Motion.div>
+                            </Motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-              </Motion.div>
+                            </Motion.button>
             )}
           </AnimatePresence>
         </Motion.section>
@@ -1946,7 +1946,7 @@ const TeacherDashboard = () => {
                 <p className="mt-2 text-sm text-slate-400">
                   Keep this page open. New submissions will appear here automatically.
                 </p>
-              </Motion.div>
+                            </Motion.button>
             )
           ) : (
             <Motion.div
@@ -1958,7 +1958,7 @@ const TeacherDashboard = () => {
               <p className="mt-2 text-sm text-slate-400">
                 Once attendance is active, this table will populate with student details.
               </p>
-            </Motion.div>
+                            </Motion.button>
           )}
         </Motion.section>
           </div>
