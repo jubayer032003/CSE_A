@@ -9,7 +9,8 @@ connectDB();
 
 const app = express();
 
-app.use(express.json());
+app.set("trust proxy", true);
+app.use(express.json({ limit: "1mb" }));
 app.use(cors());
 
 // API routes
@@ -18,6 +19,8 @@ app.use("/api/routine", require("./routes/routineRoutes"));
 app.use("/api/notices", require("./routes/noticeRoutes"));
 app.use("/api/notes", require("./routes/noteRoutes"));
 app.use("/api/compiler-videos", require("./routes/compilerVideoRoutes"));
+app.use("/api/attendance", require("./routes/attendanceRoutes"));
+app.use("/api/exam", require("./routes/examRoutes"));
 
 // Socket.io setup
 const http = require("http");

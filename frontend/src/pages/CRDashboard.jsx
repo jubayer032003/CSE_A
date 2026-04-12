@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useCallback } from "react";
+import { useEffect, useState, useContext, useCallback, useMemo, useRef } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import ReactMarkdown from "react-markdown";
@@ -29,16 +29,11 @@ const extractYouTubeVideoId = (url) => {
     if (shortsIndex !== -1 && segments[shortsIndex + 1]) {
       return segments[shortsIndex + 1];
     }
-  } catch (error) {
+  } catch {
     return "";
   }
 
   return "";
-};
-
-const getEmbedUrl = (url) => {
-  const videoId = extractYouTubeVideoId(url);
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
 };
 
 const getThumbnailUrl = (url) => {
@@ -67,6 +62,15 @@ const CRDashboard = () => {
 
   const [routine, setRoutine] = useState([]);
   const [notices, setNotices] = useState([]);
+  const [attendanceData, setAttendanceData] = useState({
+    activeSessions: [],
+    recentSessions: [],
+  });
+  const [attendanceLoading, setAttendanceLoading] = useState(true);
+  const [attendanceMessage, setAttendanceMessage] = useState("");
+  const [attendanceSubmittingId, setAttendanceSubmittingId] = useState("");
+  const [attendancePopupSession, setAttendancePopupSession] = useState(null);
+  const dismissedAttendancePopupIds = useRef(new Set());
 
   const [newClass, setNewClass] = useState({
     day: "",
@@ -102,6 +106,12 @@ const CRDashboard = () => {
   const [activeTab, setActiveTab] = useState("routine");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [videoDeleteConfirm, setVideoDeleteConfirm] = useState(null);
+  const authConfig = useMemo(
+    () => ({
+      headers: { Authorization: `Bearer ${user?.token}` },
+    }),
+    [user?.token],
+  );
 
   // ===== ROUTINE =====
   const fetchRoutine = async () => {
@@ -273,6 +283,37 @@ const CRDashboard = () => {
     }
   }, []);
 
+  const fetchAttendance = useCallback(async () => {
+    if (!user?.token) return;
+
+    setAttendanceLoading(true);
+    try {
+      const { data } = await axios.get("/api/attendance/student", authConfig);
+      const activeSessions = Array.isArray(data?.activeSessions) ? data.activeSessions : [];
+      setAttendanceData({
+        activeSessions,
+        recentSessions: Array.isArray(data?.recentSessions) ? data.recentSessions : [],
+      });
+
+      const popupSession = activeSessions.find(
+        (session) =>
+          !session.alreadySubmitted &&
+          !dismissedAttendancePopupIds.current.has(session._id),
+      );
+
+      if (popupSession) {
+        setAttendancePopupSession((prev) => prev || popupSession);
+      }
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      setAttendanceMessage(
+        error.response?.data?.message || "Could not load attendance right now.",
+      );
+    } finally {
+      setAttendanceLoading(false);
+    }
+  }, [authConfig, user?.token]);
+
   const resetVideoForm = () => {
     setVideoForm({
       title: "",
@@ -341,23 +382,44 @@ const CRDashboard = () => {
 
     const fetchInitialData = async () => {
       try {
-        const [routineData, noticesData, notesData, compilerVideosData] = await Promise.all([
+        const [routineData, noticesData, notesData, compilerVideosData, attendanceResponse] = await Promise.all([
           axios.get("/api/routine", {
             headers: { Authorization: `Bearer ${user?.token}` },
           }),
           axios.get("/api/notices"),
           axios.get("/api/notes"),
           axios.get("/api/compiler-videos"),
+          axios.get("/api/attendance/student", authConfig),
         ]);
 
         if (isMounted) {
+          const activeSessions = Array.isArray(attendanceResponse.data?.activeSessions)
+            ? attendanceResponse.data.activeSessions
+            : [];
           setRoutine(routineData.data);
           setNotices(normalizeNoticeData(noticesData.data));
           setNotes(notesData.data);
           setCompilerVideos(compilerVideosData.data);
+          setAttendanceData({
+            activeSessions,
+            recentSessions: Array.isArray(attendanceResponse.data?.recentSessions)
+              ? attendanceResponse.data.recentSessions
+              : [],
+          });
+          const popupSession = activeSessions.find(
+            (session) =>
+              !session.alreadySubmitted &&
+              !dismissedAttendancePopupIds.current.has(session._id),
+          );
+
+          if (popupSession) {
+            setAttendancePopupSession((prev) => prev || popupSession);
+          }
+          setAttendanceLoading(false);
         }
       } catch (error) {
         console.error("Error fetching initial data:", error);
+        setAttendanceLoading(false);
       }
     };
 
@@ -367,13 +429,25 @@ const CRDashboard = () => {
 
     socket.on("notice-updated", fetchNotices);
     socket.on("compiler-videos-updated", fetchCompilerVideos);
+    const handleAttendanceUpdated = (data) => {
+      fetchAttendance();
+
+      if (data?.type === "started" && data?.session && !data.session.alreadySubmitted) {
+        if (!dismissedAttendancePopupIds.current.has(data.session._id)) {
+          setAttendancePopupSession(data.session);
+        }
+      }
+    };
+
+    socket.on("attendance-updated", handleAttendanceUpdated);
 
     return () => {
       isMounted = false;
       socket.off("notice-updated", fetchNotices);
       socket.off("compiler-videos-updated", fetchCompilerVideos);
+      socket.off("attendance-updated", handleAttendanceUpdated);
     };
-  }, [user?.token, fetchNotices, fetchCompilerVideos]);
+  }, [authConfig, user?.token, fetchNotices, fetchCompilerVideos, fetchAttendance]);
 
   // Categories with colors
   const categories = {
@@ -400,8 +474,157 @@ const CRDashboard = () => {
     active: { opacity: 1 }
   };
 
+  const formatDateTime = (value) => {
+    if (!value) return "N/A";
+    const parsedDate = new Date(value);
+    if (Number.isNaN(parsedDate.getTime())) return "N/A";
+
+    return parsedDate.toLocaleString([], {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
+  const getCurrentPosition = () =>
+    new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported on this device."));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      });
+    });
+
+  const handleAttendanceSubmit = async (sessionId) => {
+    setAttendanceMessage("");
+    setAttendanceSubmittingId(sessionId);
+
+    try {
+      const position = await getCurrentPosition();
+      const { latitude, longitude, accuracy } = position.coords;
+
+      const { data } = await axios.post(
+        `/api/attendance/student/${sessionId}/submit`,
+        {
+          latitude,
+          longitude,
+          accuracy,
+          label: `Lat ${latitude.toFixed(5)}, Lng ${longitude.toFixed(5)}`,
+        },
+        authConfig,
+      );
+
+      setAttendanceData((prev) => ({
+        activeSessions: prev.activeSessions.map((session) =>
+          session._id === sessionId ? data.session : session,
+        ),
+        recentSessions: [
+          data.session,
+          ...prev.recentSessions.filter((session) => session._id !== data.session._id),
+        ].slice(0, 8),
+      }));
+      setAttendanceMessage("Attendance submitted successfully.");
+      setAttendancePopupSession(null);
+    } catch (error) {
+      setAttendanceMessage(
+        error.response?.data?.message ||
+          error.message ||
+          "Attendance submission failed.",
+      );
+    } finally {
+      setAttendanceSubmittingId("");
+    }
+  };
+
+  const closeAttendancePopup = () => {
+    if (attendancePopupSession?._id) {
+      dismissedAttendancePopupIds.current.add(attendancePopupSession._id);
+    }
+    setAttendancePopupSession(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {attendancePopupSession ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/65 px-4 py-6 backdrop-blur-sm">
+          <div className="relative w-full max-w-md overflow-hidden rounded-lg border border-emerald-300/25 bg-slate-950 shadow-2xl shadow-emerald-950/30">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-300 via-cyan-300 to-sky-300" />
+            <button
+              type="button"
+              onClick={closeAttendancePopup}
+              aria-label="Close attendance popup"
+              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-300 transition hover:bg-white/10 hover:text-white"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="p-6 pt-8">
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-emerald-300/25 bg-emerald-400/10 text-emerald-200">
+                <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                  />
+                </svg>
+              </div>
+
+              <p className="mt-5 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300/80">
+                Live Attendance
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">
+                Attendance has started
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {attendancePopupSession.teacher?.name || attendancePopupSession.teacherName || "Your teacher"} started{" "}
+                <span className="font-semibold text-white">{attendancePopupSession.title}</span>.
+              </p>
+
+              <div className="mt-5 rounded-lg border border-white/10 bg-white/[0.04] p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Started</p>
+                <p className="mt-1 text-sm font-medium text-slate-200">
+                  {formatDateTime(attendancePopupSession.startedAt)}
+                </p>
+              </div>
+
+              {attendanceMessage ? (
+                <div className="mt-4 rounded-lg border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+                  {attendanceMessage}
+                </div>
+              ) : null}
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => handleAttendanceSubmit(attendancePopupSession._id)}
+                  disabled={attendanceSubmittingId === attendancePopupSession._id}
+                  className="inline-flex flex-1 items-center justify-center rounded-lg bg-gradient-to-r from-emerald-300 to-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:from-emerald-200 hover:to-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {attendanceSubmittingId === attendancePopupSession._id
+                    ? "Submitting..."
+                    : "Submit Attendance"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeAttendancePopup}
+                  className="inline-flex flex-1 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {/* Header */}
       <Motion.div 
         initial={{ y: -100 }}
@@ -466,6 +689,79 @@ const CRDashboard = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-6"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Live Attendance</h2>
+              <p className="mt-2 text-sm text-emerald-100/80">
+                Teacher-started attendance appears here for CR accounts too.
+              </p>
+              <p className="mt-3 text-sm text-white">
+                {attendanceLoading
+                  ? "Checking attendance..."
+                  : attendanceData.activeSessions.length > 0
+                    ? `${attendanceData.activeSessions.length} active attendance session available`
+                    : "No active attendance right now"}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-emerald-100">
+              Open sessions: {attendanceData.activeSessions.length}
+            </div>
+          </div>
+
+          {attendanceMessage ? (
+            <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-black/20 px-4 py-3 text-sm text-emerald-100">
+              {attendanceMessage}
+            </div>
+          ) : null}
+
+          <div className="mt-5 space-y-4">
+            {attendanceData.activeSessions.length > 0 ? (
+              attendanceData.activeSessions.map((session) => (
+                <div
+                  key={session._id}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                >
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <p className="text-lg font-semibold text-white">{session.title}</p>
+                      <p className="mt-1 text-sm text-slate-300">
+                        Started {formatDateTime(session.startedAt)}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        Teacher: {session.teacher?.name || "Teacher"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleAttendanceSubmit(session._id)}
+                      disabled={
+                        session.alreadySubmitted ||
+                        attendanceSubmittingId === session._id
+                      }
+                      className="rounded-2xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:from-emerald-300 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {attendanceSubmittingId === session._id
+                        ? "Submitting..."
+                        : session.alreadySubmitted
+                          ? "Attendance Submitted"
+                          : "Submit Attendance"}
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-2xl border border-dashed border-white/10 bg-black/10 px-5 py-8 text-center text-sm text-slate-300">
+                No attendance has been started by a teacher yet.
+              </div>
+            )}
+          </div>
+        </Motion.div>
+
         {/* ===== ROUTINE SECTION ===== */}
         <div className={activeTab === "routine" ? "block" : "hidden"}>
           <Motion.div
