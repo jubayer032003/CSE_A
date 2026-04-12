@@ -2,27 +2,15 @@ const path = require("path");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const User = require("../models/User");
+const { invitedTeachers } = require("../config/invitedTeachers");
 
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
-
-const teachers = [
-  {
-    name: "Invited Teacher",
-    email: "teacher@metrouni.edu.bd",
-    role: "teacher",
-  },
-  {
-    name: "Invited Teacher",
-    email: "farhanaakter@metrouni.edu.bd",
-    role: "teacher",
-  }
-];
 
 const seedTeachers = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
 
-    for (const teacher of teachers) {
+    for (const teacher of invitedTeachers) {
       const existingTeacher = await User.findOne({
         email: teacher.email.toLowerCase(),
         role: "teacher",

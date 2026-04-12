@@ -690,7 +690,7 @@ const TeacherDashboard = () => {
       reader.onload = () => {
         const image = new Image();
         image.onload = () => {
-          const size = 320;
+          const size = 256;
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
           if (!context) {
@@ -707,7 +707,7 @@ const TeacherDashboard = () => {
           canvas.width = size;
           canvas.height = size;
           context.drawImage(image, x, y, width, height);
-          resolve(canvas.toDataURL("image/jpeg", 0.82));
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
         };
 
         image.onerror = () => reject(new Error("Please choose a valid image file."));
@@ -888,14 +888,14 @@ const TeacherDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-slate-950">
       {/* Subtle background decoration */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[500px] bg-gradient-to-b from-teal-500/10 via-emerald-500/5 to-transparent" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b from-teal-500/8 to-transparent" />
 
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-emerald-400/15 bg-slate-950/88 backdrop-blur-2xl">
+      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/90 backdrop-blur-xl">
         <Motion.div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_28%)]"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.08),transparent_30%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.06),transparent_24%)]"
           animate={{
             opacity: [0.7, 1, 0.7],
           }}
@@ -907,31 +907,31 @@ const TeacherDashboard = () => {
         />
         
         <Motion.div
-          className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal-300/25 to-transparent"
         />
 
-        <div className="relative mx-auto max-w-6xl px-3 py-2 sm:px-4 lg:px-5">
+        <div className="relative mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
           <Motion.div
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
-            className="relative overflow-hidden rounded-[1.35rem] border border-teal-500/30 bg-gradient-to-br from-slate-800/60 via-slate-800/40 to-slate-900/60 px-3.5 py-2.5 shadow-2xl shadow-teal-900/40 backdrop-blur-xl sm:px-4 sm:py-3 lg:px-5"
+            className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 shadow-lg shadow-black/20 backdrop-blur sm:px-5"
           >
             <AdvancedTechParticleBackground
               mode="quantum"
-              particleCount={80}
+              particleCount={36}
               primaryColor="#2dd4bf"
               secondaryColor="#22d3ee"
               tertiaryColor="#3b82f6"
               speed={1}
               interactive
               interactiveStrength={0.08}
-              showGrid
-              showConnections
+              showGrid={false}
+              showConnections={false}
               blurAmount={0.6}
-              className="opacity-80"
+              className="opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/18 via-transparent to-slate-900/22" />
+            <div className="absolute inset-0 bg-slate-900/35" />
              
             <div className="relative space-y-2.5 lg:space-y-0">
               {/* Top Row - Profile & Status */}
@@ -950,10 +950,9 @@ const TeacherDashboard = () => {
                     aria-label="Edit teacher profile"
                   >
                     <Motion.div 
-                      className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border-2 border-teal-400/60 bg-gradient-to-br from-teal-400 via-cyan-400 to-blue-500 text-base font-black text-slate-900 shadow-lg sm:h-13 sm:w-13 sm:text-lg"
+                      className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-teal-400/35 bg-gradient-to-br from-teal-400 to-cyan-400 text-base font-bold text-slate-950 sm:text-lg"
                       whileHover={{
-                        boxShadow: "0 0 25px rgba(45, 212, 191, 0.4)",
-                        scale: 1.02
+                        scale: 1.01
                       }}
                     >
                       {user?.profilePic ? (
@@ -962,7 +961,7 @@ const TeacherDashboard = () => {
                         user?.name?.charAt(0) || "T"
                       )}
                     </Motion.div>
-                    <span className="absolute -bottom-1 -right-1 rounded-full border-2 border-slate-900 bg-gradient-to-r from-teal-300 to-cyan-300 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-slate-900 shadow-md sm:-bottom-1.5 sm:-right-1.5 sm:px-2 sm:text-[9px]">
+                    <span className="absolute -bottom-1 -right-1 rounded-full border border-slate-900 bg-teal-300 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-slate-900 sm:-bottom-1.5 sm:-right-1.5 sm:px-2 sm:text-[9px]">
                       Edit
                     </span>
                   </Motion.button>
@@ -983,7 +982,7 @@ const TeacherDashboard = () => {
                         </Motion.span>
                       )}
                     </div>
-                    <h1 className="mt-0.5 text-base font-bold tracking-tight text-white truncate sm:text-lg lg:text-xl">
+                    <h1 className="mt-0.5 text-base font-semibold tracking-tight text-white truncate sm:text-lg lg:text-xl">
                       {user?.name || "Teacher"}
                     </h1>
                     <p className="text-[10px] text-slate-400 font-medium truncate sm:text-[11px]">
@@ -995,17 +994,17 @@ const TeacherDashboard = () => {
                 {/* Right - Stats & Actions */}
                 <div className="flex flex-col gap-1.5 lg:items-end">
                   {/* Quick Stats */}
-                  <div className="grid grid-cols-3 gap-1.5 rounded-lg border border-slate-700/50 bg-slate-800/40 p-1.5 backdrop-blur-sm sm:gap-2 sm:p-2">
+                  <div className="grid grid-cols-3 gap-1.5 rounded-xl border border-slate-800 bg-slate-950/40 p-2 sm:gap-2">
                     <div className="text-center px-1.5 sm:px-2">
-                      <p className="text-[9px] uppercase tracking-wider text-teal-300 font-semibold">Sessions</p>
+                      <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Sessions</p>
                       <p className="mt-0.5 text-sm font-bold text-white">{availableSessions.length}</p>
                     </div>
                     <div className="text-center border-l border-r border-slate-700 px-1.5 sm:px-2">
-                      <p className="text-[9px] uppercase tracking-wider text-cyan-300 font-semibold">Exams</p>
+                      <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Exams</p>
                       <p className="mt-0.5 text-sm font-bold text-white">{teacherExams.length}</p>
                     </div>
                     <div className="text-center px-1.5 sm:px-2">
-                      <p className="text-[9px] uppercase tracking-wider text-blue-300 font-semibold">Active</p>
+                      <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Responses</p>
                       <p className="mt-0.5 text-sm font-bold text-white">{submissions.length}</p>
                     </div>
                   </div>
@@ -1013,14 +1012,14 @@ const TeacherDashboard = () => {
                   {/* Action Buttons */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <Motion.button
-                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.97 }}
                       type="button"
                       onClick={() => {
                         setActiveTab("attendance");
                         marksSectionRef.current?.scrollIntoView({ behavior: "smooth" });
                       }}
-                      className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-teal-300/25 bg-gradient-to-r from-teal-500 via-cyan-500 to-sky-500 px-3 py-2 text-[10px] font-bold text-white shadow-lg shadow-cyan-900/35 transition sm:px-3.5 sm:text-[11px]"
+                      className="group inline-flex items-center gap-2 rounded-xl border border-teal-500/30 bg-teal-500/10 px-3 py-2 text-[10px] font-semibold text-teal-200 transition hover:bg-teal-500/15 sm:px-3.5 sm:text-[11px]"
                     >
                       <span className="group-hover:animate-pulse">▶</span>
                       <span className="flex flex-col items-start leading-none">
@@ -1031,11 +1030,11 @@ const TeacherDashboard = () => {
                       </span>
                     </Motion.button>
                     <Motion.button
-                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.97 }}
                       type="button"
                       onClick={logout}
-                      className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-rose-400/30 bg-gradient-to-br from-rose-500/18 via-red-500/14 to-slate-900/50 px-3 py-2 text-[10px] font-bold text-rose-100 shadow-lg shadow-rose-950/30 transition hover:border-rose-300/45 hover:bg-rose-500/16 sm:px-3.5 sm:text-[11px]"
+                      className="group inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-[10px] font-semibold text-slate-200 transition hover:border-slate-600 hover:bg-slate-800 sm:px-3.5 sm:text-[11px]"
                     >
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-400/14 ring-1 ring-rose-300/20">
                         <span className="text-[11px] text-rose-200 transition group-hover:-rotate-12">↗</span>
@@ -1095,15 +1094,15 @@ const TeacherDashboard = () => {
           )}
         </AnimatePresence>
         
-        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
+        <div className="grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
           <aside className="hidden self-start lg:sticky lg:top-32 lg:block">
             <Motion.nav
               initial={{ x: -18, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              className="max-h-[calc(100vh-9rem)] overflow-y-auto rounded-[1.75rem] border border-teal-500/30 bg-slate-800/70 p-3 shadow-xl shadow-teal-900/40 backdrop-blur-sm"
+              className="max-h-[calc(100vh-9rem)] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900/70 p-3 shadow-lg shadow-black/20"
             >
               <div className="border-b border-slate-700 px-3 pb-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-300">Dashboard Menu</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-300">Dashboard</p>
                 <h2 className="mt-2 text-lg font-semibold text-white">Quick Access</h2>
               </div>
               <div className="mt-3 space-y-1.5">
@@ -1140,7 +1139,7 @@ const TeacherDashboard = () => {
 
           <div className="min-w-0">
             <div className="mb-6 lg:hidden">
-              <div className="rounded-[1.5rem] border border-slate-700/50 bg-slate-800/50 p-4 shadow-lg shadow-slate-900/50 backdrop-blur-sm">
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-lg shadow-black/20">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-teal-300">Quick Access</p>
@@ -1191,31 +1190,31 @@ const TeacherDashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="scroll-mt-28 overflow-hidden rounded-[2rem] border border-slate-700/50 bg-gradient-to-br from-slate-800/40 via-slate-800/30 to-slate-800/40 p-6 shadow-2xl shadow-slate-900/50 ring-1 ring-slate-700/30 sm:p-8"
+          className="scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-slate-800 bg-slate-900/75 p-5 shadow-xl shadow-black/20 sm:p-6"
         >
           <div className="mb-8">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-teal-300">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-300">
                   Attendance & Exam Management
                 </p>
-                <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                  Manage attendance and exam marks
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[2rem]">
+                  Attendance and exam marks
                 </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                  Start and monitor attendance sessions, reopen saved spreadsheets, and publish exam results from one focused workspace.
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                  Start attendance, review session history, and manage exam sheets from one workspace.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-2 sm:gap-3 xl:min-w-[360px]">
-                <div className="rounded-2xl border border-slate-700 bg-slate-700/60 px-4 py-3 shadow-sm">
+                <div className="rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-300">Sessions</p>
                   <p className="mt-2 text-2xl font-bold text-white">{availableSessions.length}</p>
                 </div>
-                <div className="rounded-2xl border border-slate-700 bg-slate-700/60 px-4 py-3 shadow-sm">
+                <div className="rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300">Sheets</p>
                   <p className="mt-2 text-2xl font-bold text-white">{teacherExams.length}</p>
                 </div>
-                <div className="rounded-2xl border border-slate-700 bg-slate-700/60 px-4 py-3 shadow-sm">
+                <div className="rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">Responses</p>
                   <p className="mt-2 text-2xl font-bold text-white">{submissions.length}</p>
                 </div>
@@ -1223,7 +1222,7 @@ const TeacherDashboard = () => {
             </div>
 
             {/* Animated Tab Navigation */}
-            <div className="mt-8 flex gap-3 rounded-[1.6rem] border border-slate-700/50 bg-gradient-to-r from-slate-800/60 to-slate-800/40 p-1.5 shadow-md shadow-slate-900/30 backdrop-blur-sm">
+            <div className="mt-6 flex gap-2 rounded-2xl border border-slate-800 bg-slate-950/50 p-1">
               {["attendance", "examMarks"].map((tab) => (
                 <Motion.button
                   key={tab}
@@ -1274,7 +1273,7 @@ const TeacherDashboard = () => {
               >
                 <div className="grid gap-6 xl:grid-cols-[1.15fr,0.85fr]">
                   {/* Start Session Card */}
-                  <div className="rounded-[1.75rem] border border-slate-700/50 bg-gradient-to-br from-slate-800/40 via-slate-800/30 to-slate-800/40 p-6 shadow-lg shadow-slate-900/50 backdrop-blur-sm">
+                   <div className="rounded-[1.5rem] border border-slate-800 bg-slate-950/40 p-5 shadow-lg shadow-black/20">
                     <div className="space-y-6">
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-teal-300/85">
@@ -1309,7 +1308,7 @@ const TeacherDashboard = () => {
                     </div>
 
                     {/* Live Summary */}
-                    <div className="mt-8 rounded-[1.4rem] border border-slate-700 bg-gradient-to-br from-slate-700/40 to-slate-800/40 p-5 shadow-sm ring-1 ring-slate-700/50">
+                    <div className="mt-6 rounded-[1.25rem] border border-slate-800 bg-slate-950/40 p-5">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                           <p className="text-xs uppercase tracking-wider text-teal-300">
@@ -1350,10 +1349,7 @@ const TeacherDashboard = () => {
                   </div>
 
                   {/* Session History */}
-                  <div className="relative overflow-hidden rounded-[1.85rem] border border-teal-400/15 bg-gradient-to-br from-slate-900 via-slate-800/95 to-slate-900 p-6 shadow-2xl shadow-slate-950/50 backdrop-blur-sm">
-                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300" />
-                    <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-teal-400/10 blur-3xl" />
-                    <div className="absolute bottom-0 left-0 h-36 w-36 rounded-full bg-cyan-400/10 blur-3xl" />
+                   <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-950/40 p-5 shadow-lg shadow-black/20">
                     <div className="relative mb-5">
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-wider text-teal-300">
@@ -1361,7 +1357,7 @@ const TeacherDashboard = () => {
                         </p>
                         <h3 className="mt-2 text-xl font-semibold text-white">Recent sessions</h3>
                       </div>
-                      <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-medium text-slate-300">
+                      <span className="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs font-medium text-slate-300">
                         {loading ? "Loading..." : `${totalSessions} saved`}
                       </span>
                       <p className="mt-2 text-sm leading-6 text-slate-400">
@@ -1369,13 +1365,13 @@ const TeacherDashboard = () => {
                       </p>
 
                       <div className="mt-4 grid grid-cols-2 gap-3">
-                        <div className="rounded-2xl border border-emerald-400/15 bg-emerald-400/8 px-4 py-3">
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-3">
                           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-300/80">Live</p>
                           <p className="mt-2 text-2xl font-bold text-emerald-100">
                             {dashboardData.activeSession ? 1 : 0}
                           </p>
                         </div>
-                        <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/8 px-4 py-3">
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-3">
                           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300/80">Saved</p>
                           <p className="mt-2 text-2xl font-bold text-cyan-100">{totalSessions}</p>
                         </div>
@@ -1401,7 +1397,7 @@ const TeacherDashboard = () => {
                               className={`group relative w-full cursor-pointer overflow-hidden rounded-[1.35rem] p-4 text-left transition ${
                                 selectedMarksSession?._id === session._id
                                   ? "border border-teal-400/40 bg-teal-400/12 ring-2 ring-teal-400/30"
-                                  : "border border-white/8 bg-white/[0.04] hover:border-teal-300/20 hover:bg-white/[0.07]"
+                                   : "border border-slate-800 bg-slate-900/60 hover:border-slate-700 hover:bg-slate-900"
                               }`}
                             >
                               <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-emerald-400 via-teal-300 to-cyan-300 opacity-80" />
@@ -1841,18 +1837,18 @@ const TeacherDashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-8 scroll-mt-28 rounded-[2rem] border border-slate-700/50 bg-gradient-to-br from-slate-800/40 via-slate-800/30 to-slate-800/40 p-6 shadow-2xl shadow-slate-900/50 ring-1 ring-slate-700/30 sm:p-8"
+          className="mt-6 scroll-mt-28 rounded-[1.75rem] border border-slate-800 bg-slate-900/75 p-5 shadow-xl shadow-black/20 sm:p-6"
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-teal-300">
                 Student Responses
               </p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Open a saved attendance card to review submitted students
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[2rem]">
+                Review submitted students
               </h2>
-              <p className="mt-2 text-sm text-slate-300">
-                Each saved attendance card opens the list of submitted students, their student ID, and their distance from Metropolitan University.
+              <p className="mt-2 text-sm text-slate-400">
+                Open a saved session to review student submissions, timing, and location checks.
               </p>
             </div>
             <div className="flex flex-col gap-2 sm:items-end">

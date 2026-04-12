@@ -572,7 +572,7 @@ const mobileOverviewStats = useMemo(() => ([
       reader.onload = () => {
         const image = new Image();
         image.onload = () => {
-          const size = 320;
+          const size = 256;
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
           if (!context) {
@@ -587,7 +587,7 @@ const mobileOverviewStats = useMemo(() => ([
           canvas.width = size;
           canvas.height = size;
           context.drawImage(image, x, y, width, height);
-          resolve(canvas.toDataURL("image/jpeg", 0.82));
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
         };
         image.onerror = () => reject(new Error("Please choose a valid image file."));
         image.src = reader.result;
