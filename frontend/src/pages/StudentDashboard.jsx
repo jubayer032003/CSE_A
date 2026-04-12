@@ -962,7 +962,7 @@ const mobileOverviewStats = useMemo(() => ([
       </div>
 
 {/* Header */}
-<header className={`sticky top-0 z-50 border-b backdrop-blur-2xl ${themeClasses.header} relative overflow-visible lg:overflow-hidden`}>
+<header className={`sticky top-0 z-50 border-b backdrop-blur-2xl ${themeClasses.header} relative overflow-visible`}>
   {/* Animated background gradient */}
   <motion.div
     className="absolute inset-0 bg-gradient-to-r from-[#2563EB]/10 via-[#7C3AED]/10 to-[#EC4899]/10"
@@ -1018,7 +1018,7 @@ const mobileOverviewStats = useMemo(() => ([
         stiffness: 400,
         damping: 25
       }}
-      className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 shadow-2xl sm:gap-4 sm:px-5 ${themeClasses.headerInner} relative overflow-visible lg:overflow-hidden backdrop-blur-xl`}
+      className={`flex flex-wrap items-start justify-between gap-3 rounded-xl border px-3 py-3 shadow-2xl sm:items-center sm:gap-4 sm:px-5 ${themeClasses.headerInner} relative overflow-visible backdrop-blur-xl`}
     >
       {/* Subtle animated gradient overlay */}
       <motion.div
@@ -1034,17 +1034,17 @@ const mobileOverviewStats = useMemo(() => ([
         }}
       />
 
-      <div className="flex min-w-0 items-center gap-2.5 sm:gap-3 relative">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 relative">
         <motion.button
           whileHover={{ scale: 1.05, rotate: [0, -2, 2, 0] }}
           whileTap={{ scale: 0.95 }}
           type="button"
           onClick={openProfileEditor}
-          className="group relative flex-shrink-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2 focus:ring-offset-[#1E293B]"
+          className="group relative shrink-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2 focus:ring-offset-[#1E293B]"
           aria-label="Edit student profile"
         >
           <motion.div 
-            className="flex h-13 w-13 items-center justify-center overflow-hidden rounded-xl border-2 border-[#2563EB]/50 bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#EC4899] text-sm font-black text-white shadow-lg shadow-[#2563EB]/50 sm:h-14 sm:w-14"
+            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border-2 border-[#2563EB]/50 bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#EC4899] text-sm font-black text-white shadow-lg shadow-[#2563EB]/40 sm:h-14 sm:w-14"
             whileHover={{
               boxShadow: "0 0 20px rgba(37, 99, 235, 0.6)",
             }}
@@ -1056,7 +1056,7 @@ const mobileOverviewStats = useMemo(() => ([
             )}
           </motion.div>
           <motion.div 
-            className="absolute -bottom-1 -right-1 rounded-md border border-[#071019] bg-emerald-300 px-1 py-0.5 text-[8px] font-black uppercase leading-none text-emerald-950"
+            className="absolute -bottom-1 -right-1 rounded-md border border-[#071019] bg-emerald-300 px-1 py-0.5 text-[7px] font-black uppercase leading-none text-emerald-950 sm:text-[8px]"
             animate={{
               scale: [1, 1.1, 1],
               opacity: [0.8, 1, 0.8],
@@ -1072,14 +1072,14 @@ const mobileOverviewStats = useMemo(() => ([
         </motion.button>
 
         <motion.div 
-          className="flex min-w-0 items-center gap-3"
+          className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3"
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
         >
           <div className="min-w-0 leading-tight">
             <div className="flex min-w-0 items-center gap-2.5">
-              <h1 className={`truncate text-base font-bold sm:text-lg ${themeClasses.headerTitle}`}>
+              <h1 className={`truncate text-sm font-bold sm:text-lg ${themeClasses.headerTitle}`}>
                 {user?.name || "Student"}
               </h1>
               <motion.span 
@@ -1097,14 +1097,14 @@ const mobileOverviewStats = useMemo(() => ([
                 Student
               </motion.span>
             </div>
-            <div className="mt-1.5 flex max-w-[56vw] items-center gap-2 overflow-hidden text-[10px] sm:max-w-none sm:flex-wrap sm:gap-x-2.5 sm:text-xs">
+            <div className="mt-1 flex max-w-[48vw] items-center gap-1.5 overflow-hidden text-[10px] sm:max-w-none sm:flex-wrap sm:gap-x-2.5 sm:text-xs">
               <span className={`shrink-0 rounded-lg border px-2 py-1 font-semibold ${themeClasses.badgeSecondary}`}>
                 {user?.studentId || "STU001"}
               </span>
               <span className={`hidden truncate sm:inline ${themeClasses.textSecondary}`}>{user?.email || "Email required"}</span>
               <span className={`hidden sm:inline ${themeClasses.textTertiary}`}>/</span>
               <motion.span 
-                className={`truncate ${themeClasses.textTertiary}`}
+                className={`truncate max-sm:hidden ${themeClasses.textTertiary}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -1143,8 +1143,8 @@ const mobileOverviewStats = useMemo(() => ([
         </motion.div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative">
-        <div ref={noticeButtonWrapRef} className="relative">
+      <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 relative">
+        <div ref={noticeButtonWrapRef} className="relative z-[90]">
           <motion.button
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
@@ -1198,7 +1198,7 @@ const mobileOverviewStats = useMemo(() => ([
                   stiffness: 400,
                   damping: 25
                 }}
-                className={`absolute right-0 mt-3 w-[92vw] max-w-sm overflow-hidden rounded-xl border shadow-2xl backdrop-blur-2xl max-sm:left-1/2 max-sm:-translate-x-1/2 sm:w-96 ${themeClasses.modal} ${themeClasses.border}`}
+                className={`absolute right-0 top-full z-[95] mt-3 w-[min(92vw,24rem)] max-w-sm overflow-hidden rounded-xl border shadow-2xl backdrop-blur-2xl max-sm:left-1/2 max-sm:right-auto max-sm:w-[calc(100vw-1.5rem)] max-sm:max-w-none max-sm:-translate-x-1/2 ${themeClasses.modal} ${themeClasses.border}`}
               >
                 <div className={`border-b px-4 py-3.5 ${themeClasses.layer3}`}>
                   <p className={`text-sm font-bold ${themeClasses.headerTitle}`}>Notifications</p>
@@ -1222,7 +1222,7 @@ const mobileOverviewStats = useMemo(() => ([
                 )}
 
                 {previewNotices.length > 0 ? (
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="max-h-[min(24rem,70vh)] overflow-y-auto">
                     {previewNotices.map((notice, index) => (
                       <motion.button
                         key={notice._id}
