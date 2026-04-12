@@ -96,6 +96,7 @@ const TeacherDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState("");
   const [marksSessionId, setMarksSessionId] = useState("");
   const [selectedAttendanceSessionId, setSelectedAttendanceSessionId] = useState("");
   const [marksRows, setMarksRows] = useState([]);
@@ -580,55 +581,70 @@ const TeacherDashboard = () => {
     const targetSession = availableSessions.find((session) => session._id === sessionId);
     if (!targetSession) return;
 
-    const confirmed = window.confirm(
-      `Delete "${targetSession.title}" from session history? This cannot be undone.`,
-    );
-    if (!confirmed) return;
-
     setActionLoading(`delete-session-${sessionId}`);
     setFeedback("");
 
     try {
       const { data } = await axios.delete(`/api/attendance/teacher/${sessionId}`, authConfig);
-      const { data: refreshedDashboard } = await axios.get("/api/attendance/teacher", authConfig);
-      const nextRoster = Array.isArray(refreshedDashboard?.studentRoster)
-        ? refreshedDashboard.studentRoster
-        : [];
-      const nextDashboardData = {
-        activeSession: refreshedDashboard?.activeSession || null,
-        recentSessions: Array.isArray(refreshedDashboard?.recentSessions)
-          ? refreshedDashboard.recentSessions
-          : [],
-      };
-      const nextAvailableSessions = uniqueSessions(
-        nextDashboardData.activeSession,
-        nextDashboardData.recentSessions,
-      );
+      setDashboardData((prev) => {
+        const nextDashboard = {
+          activeSession:
+            prev.activeSession?._id === sessionId ? null : prev.activeSession,
+          recentSessions: prev.recentSessions.filter((session) => session._id !== sessionId),
+        };
 
-      setStudentRoster((prev) => (areRostersEqual(prev, nextRoster) ? prev : nextRoster));
-      setDashboardData(nextDashboardData);
-
-      if (!nextAvailableSessions.length) {
-        setMarksSessionId("");
-        setSelectedAttendanceSessionId("");
-        setMarksRows([]);
-      } else {
-        const fallbackSessionId = nextAvailableSessions[0]._id;
-
-        setMarksSessionId((prev) =>
-          prev && prev !== sessionId && nextAvailableSessions.some((session) => session._id === prev)
-            ? prev
-            : fallbackSessionId,
+        const nextAvailableSessions = uniqueSessions(
+          nextDashboard.activeSession,
+          nextDashboard.recentSessions,
         );
-        setSelectedAttendanceSessionId((prev) =>
-          prev && prev !== sessionId && nextAvailableSessions.some((session) => session._id === prev)
-            ? prev
-            : fallbackSessionId,
-        );
+
+        if (!nextAvailableSessions.length) {
+          setMarksSessionId("");
+          setSelectedAttendanceSessionId("");
+          setMarksRows([]);
+        } else {
+          const fallbackSessionId = nextAvailableSessions[0]._id;
+
+          setMarksSessionId((prevId) =>
+            prevId &&
+            prevId !== sessionId &&
+            nextAvailableSessions.some((session) => session._id === prevId)
+              ? prevId
+              : fallbackSessionId,
+          );
+          setSelectedAttendanceSessionId((prevId) =>
+            prevId &&
+            prevId !== sessionId &&
+            nextAvailableSessions.some((session) => session._id === prevId)
+              ? prevId
+              : fallbackSessionId,
+          );
+        }
+
+        return nextDashboard;
+      });
+
+      try {
+        const { data: refreshedDashboard } = await axios.get("/api/attendance/teacher", authConfig);
+        const nextRoster = Array.isArray(refreshedDashboard?.studentRoster)
+          ? refreshedDashboard.studentRoster
+          : [];
+
+        setStudentRoster((prev) => (areRostersEqual(prev, nextRoster) ? prev : nextRoster));
+        setDashboardData({
+          activeSession: refreshedDashboard?.activeSession || null,
+          recentSessions: Array.isArray(refreshedDashboard?.recentSessions)
+            ? refreshedDashboard.recentSessions
+            : [],
+        });
+      } catch (refreshError) {
+        console.warn("Attendance dashboard refresh failed after delete:", refreshError);
       }
 
+      setPendingDeleteSessionId("");
       setFeedback(data?.message || "Attendance session deleted successfully.");
     } catch (error) {
+      setPendingDeleteSessionId("");
       setFeedback(
         error.response?.data?.message || "Could not delete this attendance session right now.",
       );
@@ -1389,22 +1405,49 @@ const TeacherDashboard = () => {
                               }`}
                             >
                               <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-emerald-400 via-teal-300 to-cyan-300 opacity-80" />
-                              <button
-                                type="button"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleDeleteAttendanceSession(session._id);
-                                }}
-                                disabled={session.status === "active" || actionLoading === `delete-session-${session._id}`}
-                                className="absolute right-3 top-3 z-10 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-                                title={
-                                  session.status === "active"
-                                    ? "Close this session before deleting it"
-                                    : "Delete session"
-                                }
-                              >
-                                {actionLoading === `delete-session-${session._id}` ? "Deleting..." : "Delete"}
-                              </button>
+                              {pendingDeleteSessionId === session._id ? (
+                                <div
+                                  className="absolute right-3 top-3 z-10 flex items-center gap-2 rounded-2xl border border-red-500/25 bg-slate-950/95 px-2 py-2 shadow-xl shadow-red-950/20 backdrop-blur"
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  <span className="hidden text-[11px] font-medium text-red-200 sm:inline">
+                                    Delete this session?
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setPendingDeleteSessionId("")}
+                                    className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteAttendanceSession(session._id)}
+                                    disabled={actionLoading === `delete-session-${session._id}`}
+                                    className="rounded-lg border border-red-500/30 bg-red-500/15 px-2.5 py-1.5 text-[11px] font-semibold text-red-200 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50"
+                                  >
+                                    {actionLoading === `delete-session-${session._id}` ? "Deleting..." : "Confirm"}
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    setPendingDeleteSessionId(session._id);
+                                    setFeedback("");
+                                  }}
+                                  disabled={session.status === "active" || actionLoading === `delete-session-${session._id}`}
+                                  className="absolute right-3 top-3 z-10 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                  title={
+                                    session.status === "active"
+                                      ? "Close this session before deleting it"
+                                      : "Delete session"
+                                  }
+                                >
+                                  Delete
+                                </button>
+                              )}
                               <div className="pr-24 flex items-start justify-between gap-2">
                                 <div className="flex-1">
                                   <p className="text-sm font-semibold text-white">{session.title}</p>
