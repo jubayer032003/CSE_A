@@ -590,18 +590,41 @@ const TeacherDashboard = () => {
 
     try {
       const { data } = await axios.delete(`/api/attendance/teacher/${sessionId}`, authConfig);
+      const { data: refreshedDashboard } = await axios.get("/api/attendance/teacher", authConfig);
+      const nextRoster = Array.isArray(refreshedDashboard?.studentRoster)
+        ? refreshedDashboard.studentRoster
+        : [];
+      const nextDashboardData = {
+        activeSession: refreshedDashboard?.activeSession || null,
+        recentSessions: Array.isArray(refreshedDashboard?.recentSessions)
+          ? refreshedDashboard.recentSessions
+          : [],
+      };
+      const nextAvailableSessions = uniqueSessions(
+        nextDashboardData.activeSession,
+        nextDashboardData.recentSessions,
+      );
 
-      setDashboardData((prev) => ({
-        activeSession:
-          prev.activeSession?._id === sessionId ? null : prev.activeSession,
-        recentSessions: prev.recentSessions.filter((session) => session._id !== sessionId),
-      }));
+      setStudentRoster((prev) => (areRostersEqual(prev, nextRoster) ? prev : nextRoster));
+      setDashboardData(nextDashboardData);
 
-      if (marksSessionId === sessionId) {
+      if (!nextAvailableSessions.length) {
         setMarksSessionId("");
-      }
-      if (selectedAttendanceSessionId === sessionId) {
         setSelectedAttendanceSessionId("");
+        setMarksRows([]);
+      } else {
+        const fallbackSessionId = nextAvailableSessions[0]._id;
+
+        setMarksSessionId((prev) =>
+          prev && prev !== sessionId && nextAvailableSessions.some((session) => session._id === prev)
+            ? prev
+            : fallbackSessionId,
+        );
+        setSelectedAttendanceSessionId((prev) =>
+          prev && prev !== sessionId && nextAvailableSessions.some((session) => session._id === prev)
+            ? prev
+            : fallbackSessionId,
+        );
       }
 
       setFeedback(data?.message || "Attendance session deleted successfully.");
