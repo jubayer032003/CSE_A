@@ -10,11 +10,11 @@ const METROPOLITAN_UNIVERSITY_CAMPUS = {
 };
 
 const LIVE_ATTENDANCE_POLICY = {
-  challengeLifetimeMs: 2 * 60 * 1000,
-  samplesRequired: 4,
-  minDurationMs: 12 * 1000,
-  maxAccuracyMeters: 80,
-  maxSampleAgeMs: 20 * 1000,
+  challengeLifetimeMs: 5 * 60 * 1000,
+  samplesRequired: 3,
+  minDurationMs: 8 * 1000,
+  maxAccuracyMeters: 120,
+  maxSampleAgeMs: 30 * 1000,
   maxFutureSkewMs: 10 * 1000,
   maxReasonableSpeedMetersPerSecond: 40,
 };

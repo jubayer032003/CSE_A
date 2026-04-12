@@ -371,8 +371,8 @@ const StudentDashboard = () => {
         return;
       }
 
-      const samplesRequired = Number(policy.samplesRequired) || 4;
-      const minDurationMs = Number(policy.minDurationMs) || 12000;
+      const samplesRequired = Number(policy.samplesRequired) || 3;
+      const minDurationMs = Number(policy.minDurationMs) || 8000;
       const samples = [];
       const startedAt = Date.now();
       let settled = false;
@@ -385,6 +385,28 @@ const StudentDashboard = () => {
         callback(value);
       };
 
+      const addSample = (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        const recordedAt = position.timestamp || Date.now();
+        const previousSample = samples[samples.length - 1];
+        if (
+          previousSample &&
+          Math.abs(previousSample.latitude - latitude) < 0.000001 &&
+          Math.abs(previousSample.longitude - longitude) < 0.000001 &&
+          Math.abs((previousSample.recordedAt || 0) - recordedAt) < 1500
+        ) {
+          return;
+        }
+
+        samples.push({
+          latitude,
+          longitude,
+          accuracy,
+          recordedAt,
+          label: `Lat ${latitude.toFixed(5)}, Lng ${longitude.toFixed(5)}`,
+        });
+      };
+
       const maybeResolve = () => {
         const durationMs = Date.now() - startedAt;
         if (samples.length >= samplesRequired && durationMs >= minDurationMs) {
@@ -394,17 +416,17 @@ const StudentDashboard = () => {
 
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
-          const { latitude, longitude, accuracy } = position.coords;
-          samples.push({
-            latitude,
-            longitude,
-            accuracy,
-            recordedAt: position.timestamp || Date.now(),
-            label: `Lat ${latitude.toFixed(5)}, Lng ${longitude.toFixed(5)}`,
-          });
+          addSample(position);
           maybeResolve();
         },
         (error) => {
+          if (error?.code === 3) {
+            if (samples.length >= samplesRequired && Date.now() - startedAt >= minDurationMs) {
+              finish(resolve, samples);
+            }
+            return;
+          }
+
           finish(
             reject,
             new Error(error?.message || "Could not read your live location."),
@@ -412,7 +434,7 @@ const StudentDashboard = () => {
         },
         {
           enableHighAccuracy: true,
-          timeout: 15000,
+          timeout: 25000,
           maximumAge: 0,
         },
       );
@@ -425,9 +447,9 @@ const StudentDashboard = () => {
 
         finish(
           reject,
-          new Error("We could not collect enough live GPS samples. Please stay outdoors and try again."),
+          new Error("Live location took too long. Attendance is still open, so please move near a window or outdoors and try again."),
         );
-      }, Math.max(minDurationMs + 18000, 25000));
+      }, Math.max(minDurationMs + 32000, 40000));
     });
   }, []);
 

@@ -1560,23 +1560,23 @@ const TeacherDashboard = () => {
                       >
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-600">
+                            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">
                               Exam Marks Entry
                             </p>
                             <div className="mt-3 grid gap-4 md:grid-cols-2">
                               <label className="block">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
                                   Exam Name
                                 </span>
                                 <input
                                   type="text"
                                   value={examName}
                                   onChange={(e) => handleExamNameChange(e.target.value)}
-                                  className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                  className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                                 />
                               </label>
                               <label className="block">
-                                <span className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
                                   Total Marks
                                 </span>
                                 <input
@@ -1584,53 +1584,53 @@ const TeacherDashboard = () => {
                                   min="1"
                                   value={examTotalMarks}
                                   onChange={(e) => handleExamTotalMarksChange(e.target.value)}
-                                  className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                  className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                                 />
                               </label>
                             </div>
-                            <p className="mt-3 text-sm text-gray-600">
+                            <p className="mt-3 text-sm text-slate-400">
                               Enter marks (0-{activeExam?.totalMarks}) for all students, then save the spreadsheet or publish the result.
                             </p>
                           </div>
 
-                          <div className="rounded-[1.4rem] border border-cyan-100 bg-white/95 p-4 shadow-sm ring-1 ring-white/70 lg:w-[280px]">
+                          <div className="rounded-[1.4rem] border border-cyan-500/20 bg-slate-900/80 p-4 shadow-sm ring-1 ring-cyan-500/10 lg:w-[280px]">
                             <div>
-                              <p className="text-xs uppercase tracking-wider text-gray-500">Exam Date</p>
-                              <p className="mt-1 text-sm font-semibold text-gray-900">{formatDateTime(activeExam?.date)}</p>
+                              <p className="text-xs uppercase tracking-wider text-slate-400">Exam Date</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-100">{formatDateTime(activeExam?.date)}</p>
                             </div>
-                            <div className="mt-3 border-t border-gray-200 pt-3">
-                              <p className="text-xs uppercase tracking-wider text-gray-500">Total Marks</p>
-                              <p className="mt-1 text-2xl font-semibold text-emerald-700">{activeExam?.totalMarks}</p>
+                            <div className="mt-3 border-t border-slate-700 pt-3">
+                              <p className="text-xs uppercase tracking-wider text-slate-400">Total Marks</p>
+                              <p className="mt-1 text-2xl font-semibold text-emerald-300">{activeExam?.totalMarks}</p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-[1.4rem] border border-cyan-100 bg-white/95 ring-1 ring-white/70">
+                        <div className="overflow-hidden rounded-[1.4rem] border border-cyan-500/20 bg-slate-950/90 ring-1 ring-cyan-500/10">
                           <div className="max-h-[52vh] overflow-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                              <thead className="sticky top-0 z-10 bg-gray-50">
+                            <table className="min-w-full divide-y divide-slate-800">
+                              <thead className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur">
                                 <tr>
-                                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">
                                     Student Name
                                   </th>
-                                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">
                                     Student ID
                                   </th>
-                                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">
                                     Obtained Marks
                                   </th>
-                                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-300">
                                     Action
                                   </th>
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-gray-200 bg-white">
+                              <tbody className="divide-y divide-slate-800 bg-slate-950/60">
                                 {marksRows.map((row) => (
-                                  <tr key={row.student} className="transition hover:bg-gray-50">
-                                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                                  <tr key={row.student} className="transition hover:bg-slate-900/80">
+                                    <td className="px-4 py-3 text-sm font-medium text-slate-100">
                                       {row.studentName}
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-600">
+                                    <td className="px-4 py-3 text-sm text-slate-400">
                                       {row.studentId}
                                     </td>
                                     <td className="px-4 py-3">
@@ -1642,7 +1642,7 @@ const TeacherDashboard = () => {
                                         onChange={(e) =>
                                           handleUpdateExamMarks(row.student, e.target.value)
                                         }
-                                        className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                        className="w-24 rounded-lg border border-slate-600 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                                       />
                                     </td>
                                     <td className="px-4 py-3 text-center">
@@ -1651,7 +1651,7 @@ const TeacherDashboard = () => {
                                         whileTap={{ scale: 0.9 }}
                                         type="button"
                                         onClick={() => handleDeleteStudentMarks(row.student)}
-                                        className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 p-2 text-red-600 transition hover:bg-red-100"
+                                        className="inline-flex items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 p-2 text-red-300 transition hover:bg-red-500/20"
                                         title="Clear marks"
                                       >
                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1668,9 +1668,9 @@ const TeacherDashboard = () => {
 
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-center gap-3 text-sm">
-                            <span className="text-gray-600">{marksRows.length} students</span>
-                            <span className="h-1 w-1 rounded-full bg-gray-300" />
-                            <span className="font-medium text-emerald-700">
+                            <span className="text-slate-400">{marksRows.length} students</span>
+                            <span className="h-1 w-1 rounded-full bg-slate-600" />
+                            <span className="font-medium text-emerald-300">
                               {activeExam?.isPublished ? "Published sheet" : "Draft sheet"}
                             </span>
                           </div>
@@ -1680,7 +1680,7 @@ const TeacherDashboard = () => {
                               whileTap={{ scale: 0.98 }}
                               type="button"
                               onClick={resetExamEditor}
-                              className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                              className="rounded-xl border border-slate-600 bg-slate-900/80 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-800"
                             >
                               Close Sheet
                             </Motion.button>
@@ -1690,7 +1690,7 @@ const TeacherDashboard = () => {
                               type="button"
                               onClick={handleSaveExamSheet}
                               disabled={actionLoading === "saveExam" || actionLoading === "publish"}
-                              className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {actionLoading === "saveExam" ? "Saving..." : "Save Spreadsheet"}
                             </Motion.button>
@@ -1700,7 +1700,7 @@ const TeacherDashboard = () => {
                               type="button"
                               onClick={handlePublishExamResults}
                               disabled={actionLoading === "publish" || actionLoading === "saveExam"}
-                              className="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition hover:from-emerald-600 hover:to-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-950/50 transition hover:from-emerald-600 hover:to-green-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {actionLoading === "publish" ? "Publishing..." : "Publish Results"}
                             </Motion.button>
