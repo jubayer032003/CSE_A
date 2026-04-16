@@ -99,8 +99,8 @@ const NoticeManager = () => {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 p-3 sm:items-center sm:p-4">
-          <div className="w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-2xl bg-white p-4 shadow-lg sm:max-h-[calc(100dvh-3rem)] sm:p-6">
+        <div className="fixed inset-0 z-50 flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-black/50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:items-center sm:p-4">
+          <div className="w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-t-2xl rounded-b-xl bg-white p-4 shadow-lg sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl sm:p-6">
             <h2 className="text-xl mb-4">
               {editing ? "Edit Notice" : "Add Notice"}
             </h2>
@@ -115,7 +115,7 @@ const NoticeManager = () => {
             />
 
             <textarea
-              className="border w-full p-2"
+              className="min-h-32 border w-full p-2"
               placeholder="Content"
               value={form.content}
               onChange={(e) =>
@@ -123,17 +123,17 @@ const NoticeManager = () => {
               }
             />
 
-            <div className="mt-4 flex flex-col-reverse justify-end gap-2 sm:flex-row">
+            <div className="sticky bottom-0 -mx-4 mt-4 flex flex-col-reverse justify-end gap-2 border-t border-slate-200 bg-white px-4 pb-1 pt-4 sm:static sm:mx-0 sm:flex-row sm:border-0 sm:p-0">
               <button
                 onClick={() => setModalOpen(false)}
-                className="w-full px-3 py-2 sm:w-auto"
+                className="min-h-11 w-full px-3 py-2 sm:w-auto"
               >
                 Cancel
               </button>
 
               <button
                 onClick={saveNotice}
-                className="w-full rounded bg-blue-600 px-3 py-2 text-white sm:w-auto"
+                className="min-h-11 w-full rounded bg-blue-600 px-3 py-2 text-white sm:w-auto"
               >
                 Save
               </button>

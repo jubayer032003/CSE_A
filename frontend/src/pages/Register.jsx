@@ -283,7 +283,7 @@ const Register = () => {
             initial={{ y: -60, opacity: 0, scale: 0.9 }}
             animate={{ y: 10, opacity: 1, scale: 1 }}
             exit={{ y: -60, opacity: 0, scale: 0.9 }}
-            className={`fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-auto mx-auto sm:mx-0 max-w-[calc(100%-16px)] sm:max-w-md px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white text-sm sm:text-base font-medium shadow-2xl z-50 flex items-center gap-2 backdrop-blur-md ${
+            className={`fixed left-2 right-2 top-[max(0.5rem,env(safe-area-inset-top))] z-50 mx-auto flex max-w-[calc(100vw-1rem)] items-start gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-2xl backdrop-blur-md sm:left-4 sm:right-auto sm:top-4 sm:mx-0 sm:max-w-md sm:px-6 sm:text-base ${
               toast.type === "success"
                 ? "bg-gradient-to-r from-emerald-500/90 to-teal-500/90 border border-emerald-400/40"
                 : "bg-gradient-to-r from-rose-500/90 to-pink-500/90 border border-rose-400/40"
@@ -298,7 +298,7 @@ const Register = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}
-            <span className="flex-1">{toast.message}</span>
+            <span className="min-w-0 flex-1 break-words leading-5">{toast.message}</span>
           </Motion.div>
         )}
       </AnimatePresence>
@@ -310,7 +310,7 @@ const Register = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="fixed inset-0 flex items-center justify-center z-40 pointer-events-none"
+            className="pointer-events-none fixed inset-0 z-40 flex min-h-[100dvh] items-center justify-center overflow-hidden"
           >
             {[...Array(30)].map((_, i) => (
               <Motion.div

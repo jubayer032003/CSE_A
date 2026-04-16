@@ -51,8 +51,10 @@ const getCampusDistanceMessage = (location) => {
 const getSubmissionFlagSummary = (entry) => {
   const issues = [];
   if (entry?.flags?.riskyIp) issues.push("Suspicious IP");
+  if (entry?.flags?.duplicateDevice) issues.push("Duplicate device");
   if (entry?.flags?.unusualLocation) issues.push("Unusual location");
   if (entry?.flags?.weakVerification) issues.push("Weak live proof");
+  if (entry?.flags?.sharedIp) issues.push("Shared network");
   return issues.length ? issues.join(" + ") : "Clear";
 };
 
@@ -1967,6 +1969,19 @@ const TeacherDashboard = () => {
                                   {[entry.ipRisk?.isp, entry.ipRisk?.org].filter(Boolean).join(" • ")}
                                 </div>
                               )}
+                              {entry.deviceRisk?.sharedIp && (
+                                <div className="mt-2 rounded-lg bg-amber-500/10 px-2 py-1 text-xs text-amber-200 ring-1 ring-amber-500/30">
+                                  Shared with {entry.deviceRisk.sharedIpWithStudentName || "another student"}
+                                  {entry.deviceRisk.sharedIpWithStudentId
+                                    ? ` (${entry.deviceRisk.sharedIpWithStudentId})`
+                                    : ""}
+                                </div>
+                              )}
+                              {entry.deviceRisk?.duplicateDevice && (
+                                <div className="mt-2 rounded-lg bg-red-500/10 px-2 py-1 text-xs text-red-200 ring-1 ring-red-500/30">
+                                  Same device as {entry.deviceRisk.duplicateWithStudentName || "another student"}
+                                </div>
+                              )}
                             </td>
                             <td className="px-5 py-4 text-sm">
                               <span
@@ -2033,7 +2048,7 @@ const TeacherDashboard = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[80] flex items-end justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-4 sm:py-6"
+          className="fixed inset-0 z-[80] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:items-center sm:px-4 sm:py-6"
           style={{
             background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0.85) 100%)",
             backdropFilter: "blur(12px)",
@@ -2048,7 +2063,7 @@ const TeacherDashboard = () => {
               stiffness: 400,
               damping: 25
             }}
-            className="relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] bg-white shadow-2xl border border-emerald-200/30 backdrop-blur-xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl"
+            className="relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-t-[1.75rem] rounded-b-2xl bg-white shadow-2xl border border-emerald-200/30 backdrop-blur-xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl"
           >
             {/* Animated gradient background */}
             <Motion.div
@@ -2227,7 +2242,7 @@ const TeacherDashboard = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={profileSaving}
-                className="mt-5 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-emerald-600 hover:to-green-700 disabled:opacity-50"
+                className="sticky bottom-0 -mx-5 mt-5 min-h-11 w-[calc(100%+2.5rem)] border-t border-emerald-100 bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 sm:static sm:mx-0 sm:w-full sm:rounded-xl sm:border-0"
               >
                 {profileSaving ? "Saving..." : "Save Profile"}
               </Motion.button>

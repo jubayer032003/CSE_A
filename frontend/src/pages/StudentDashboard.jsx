@@ -364,6 +364,23 @@ const StudentDashboard = () => {
     });
   }, []);
 
+  const buildDeviceFingerprint = useCallback(() => {
+    const screenInfo = window.screen
+      ? `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`
+      : "";
+    return [
+      navigator.userAgent || "",
+      navigator.platform || "",
+      Array.isArray(navigator.languages) ? navigator.languages.join(",") : navigator.language || "",
+      Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+      screenInfo,
+      window.devicePixelRatio || "",
+      navigator.hardwareConcurrency || "",
+      navigator.deviceMemory || "",
+      Boolean(navigator.maxTouchPoints),
+    ].join("|");
+  }, []);
+
   const collectLiveLocationSamples = useCallback((policy = {}) => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -376,12 +393,16 @@ const StudentDashboard = () => {
       const samples = [];
       const startedAt = Date.now();
       let settled = false;
+      let watchId = null;
+      let sampleIntervalId = null;
+      let forceTimeoutId = null;
 
       const finish = (callback, value) => {
         if (settled) return;
         settled = true;
-        navigator.geolocation.clearWatch(watchId);
-        window.clearTimeout(forceTimeoutId);
+        if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+        if (sampleIntervalId !== null) window.clearInterval(sampleIntervalId);
+        if (forceTimeoutId !== null) window.clearTimeout(forceTimeoutId);
         callback(value);
       };
 
@@ -414,7 +435,22 @@ const StudentDashboard = () => {
         }
       };
 
-      const watchId = navigator.geolocation.watchPosition(
+      const pullCurrentSample = () => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            addSample(position);
+            maybeResolve();
+          },
+          () => {},
+          {
+            enableHighAccuracy: true,
+            timeout: 12000,
+            maximumAge: 0,
+          },
+        );
+      };
+
+      watchId = navigator.geolocation.watchPosition(
         (position) => {
           addSample(position);
           maybeResolve();
@@ -438,8 +474,10 @@ const StudentDashboard = () => {
           maximumAge: 0,
         },
       );
+      sampleIntervalId = window.setInterval(pullCurrentSample, 3000);
+      pullCurrentSample();
 
-      const forceTimeoutId = window.setTimeout(() => {
+      forceTimeoutId = window.setTimeout(() => {
         if (samples.length >= samplesRequired) {
           finish(resolve, samples);
           return;
@@ -537,6 +575,7 @@ const mobileOverviewStats = useMemo(() => ([
             secureContext: window.isSecureContext,
             platform: navigator.platform || "",
             userAgent: navigator.userAgent || "",
+            fingerprint: buildDeviceFingerprint(),
           },
           latitude: latestPosition?.latitude,
           longitude: latestPosition?.longitude,
@@ -557,7 +596,7 @@ const mobileOverviewStats = useMemo(() => ([
     } finally {
       setAttendanceSubmittingId("");
     }
-  }, [attendanceData.activeSessions, user?.token, collectLiveLocationSamples, getCurrentPosition]);
+  }, [attendanceData.activeSessions, user?.token, collectLiveLocationSamples, getCurrentPosition, buildDeviceFingerprint]);
 
   const closeAttendancePopup = useCallback(() => {
     if (attendancePopupSession?._id) {
@@ -1198,7 +1237,7 @@ const mobileOverviewStats = useMemo(() => ([
                   stiffness: 400,
                   damping: 25
                 }}
-                className={`absolute right-0 top-full z-[95] mt-3 w-[min(92vw,24rem)] max-w-sm overflow-hidden rounded-xl border shadow-2xl backdrop-blur-2xl max-sm:left-1/2 max-sm:right-auto max-sm:w-[calc(100vw-1.5rem)] max-sm:max-w-none max-sm:-translate-x-1/2 ${themeClasses.modal} ${themeClasses.border}`}
+                className={`absolute right-0 top-full z-[95] mt-3 flex max-h-[min(32rem,calc(100dvh-6rem))] w-[min(92vw,24rem)] max-w-sm flex-col overflow-hidden rounded-xl border shadow-2xl backdrop-blur-2xl max-sm:left-1/2 max-sm:right-auto max-sm:w-[calc(100vw-1.5rem)] max-sm:max-w-none max-sm:-translate-x-1/2 ${themeClasses.modal} ${themeClasses.border}`}
               >
                 <div className={`border-b px-4 py-3.5 ${themeClasses.layer3}`}>
                   <p className={`text-sm font-bold ${themeClasses.headerTitle}`}>Notifications</p>
@@ -1222,7 +1261,7 @@ const mobileOverviewStats = useMemo(() => ([
                 )}
 
                 {previewNotices.length > 0 ? (
-                  <div className="max-h-[min(24rem,70vh)] overflow-y-auto">
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                     {previewNotices.map((notice, index) => (
                       <motion.button
                         key={notice._id}
@@ -1316,7 +1355,7 @@ const mobileOverviewStats = useMemo(() => ([
                   stiffness: 400,
                   damping: 25
                 }}
-                className={`absolute right-0 top-full z-[70] mt-3 w-[min(88vw,20rem)] min-w-[16rem] max-w-[20rem] origin-top-right overflow-hidden rounded-[1.1rem] border shadow-2xl backdrop-blur-2xl ${themeClasses.modal} ${themeClasses.border}`}
+                className={`absolute right-0 top-full z-[70] mt-3 max-h-[min(32rem,calc(100dvh-6rem))] w-[min(88vw,20rem)] min-w-[16rem] max-w-[20rem] origin-top-right overflow-y-auto overscroll-contain rounded-[1.1rem] border shadow-2xl backdrop-blur-2xl max-sm:right-0 max-sm:w-[calc(100vw-1.5rem)] max-sm:min-w-0 ${themeClasses.modal} ${themeClasses.border}`}
               >
                 <div className={`border-b px-4 py-3 ${themeClasses.layer3}`}>
                   <div className="flex items-start justify-between gap-3">
@@ -1555,7 +1594,7 @@ const mobileOverviewStats = useMemo(() => ([
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[80] flex items-end justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-4 sm:py-6"
+      className="fixed inset-0 z-[80] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:items-center sm:px-4 sm:py-6"
       style={{
         background: "radial-gradient(circle at center, rgba(37,99,235,0.15) 0%, rgba(0,0,0,0.85) 100%)",
         backdropFilter: "blur(12px)",
@@ -1570,7 +1609,7 @@ const mobileOverviewStats = useMemo(() => ([
           stiffness: 400,
           damping: 25
         }}
-        className={`relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] shadow-2xl ${themeClasses.modal} ${themeClasses.border} backdrop-blur-xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl`}
+        className={`relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-t-[1.75rem] rounded-b-2xl shadow-2xl ${themeClasses.modal} ${themeClasses.border} backdrop-blur-xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl`}
       >
         {/* Animated gradient background */}
         <motion.div
@@ -1844,7 +1883,7 @@ const mobileOverviewStats = useMemo(() => ([
           )}
 
           <motion.div 
-            className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"
+            className="sticky bottom-0 -mx-5 mt-5 flex flex-col-reverse gap-3 border-t border-white/10 bg-slate-950/85 px-5 pb-1 pt-4 backdrop-blur-xl sm:static sm:mx-0 sm:flex-row sm:justify-end sm:border-0 sm:bg-transparent sm:p-0"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
@@ -1854,7 +1893,7 @@ const mobileOverviewStats = useMemo(() => ([
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={() => setProfileOpen(false)}
-              className={`rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition-all ${themeClasses.buttonSecondary} hover:border-[#EC4899]/30`}
+              className={`min-h-11 rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition-all ${themeClasses.buttonSecondary} hover:border-[#EC4899]/30`}
             >
               Cancel
             </motion.button>
@@ -1863,7 +1902,7 @@ const mobileOverviewStats = useMemo(() => ([
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={profileSaving}
-              className="relative overflow-hidden rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all disabled:cursor-not-allowed disabled:opacity-60 shadow-lg hover:shadow-xl"
+              className="relative min-h-11 overflow-hidden rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all disabled:cursor-not-allowed disabled:opacity-60 shadow-lg hover:shadow-xl"
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#EC4899]"
@@ -1908,7 +1947,7 @@ const mobileOverviewStats = useMemo(() => ([
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[70] flex items-end justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-4 sm:py-6"
+      className="fixed inset-0 z-[70] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:items-center sm:px-4 sm:py-6"
       style={{
         background: "radial-gradient(circle at center, rgba(16,185,129,0.15) 0%, rgba(0,0,0,0.85) 100%)",
         backdropFilter: "blur(12px)",
@@ -1923,7 +1962,7 @@ const mobileOverviewStats = useMemo(() => ([
           stiffness: 400,
           damping: 25
         }}
-        className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] border-2 border-emerald-400/30 shadow-2xl shadow-emerald-950/40 sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl"
+        className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-t-[1.75rem] rounded-b-2xl border-2 border-emerald-400/30 shadow-2xl shadow-emerald-950/40 sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl"
       >
         {/* Animated emerald gradient background */}
         <motion.div
@@ -2084,7 +2123,7 @@ const mobileOverviewStats = useMemo(() => ([
           )}
 
           <motion.div 
-            className="mt-6 flex flex-col gap-3 sm:flex-row"
+            className="sticky bottom-0 -mx-6 mt-6 flex flex-col gap-3 border-t border-emerald-300/15 bg-emerald-950/85 px-6 pb-1 pt-4 backdrop-blur-xl sm:static sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:p-0"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
@@ -2095,7 +2134,7 @@ const mobileOverviewStats = useMemo(() => ([
               type="button"
               onClick={() => handleAttendanceSubmit(attendancePopupSession._id)}
               disabled={attendanceSubmittingId === attendancePopupSession._id}
-              className="relative flex-1 overflow-hidden rounded-xl px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/50 transition-all disabled:cursor-not-allowed disabled:opacity-60 hover:shadow-xl hover:shadow-emerald-500/60"
+              className="relative min-h-11 flex-1 overflow-hidden rounded-xl px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/50 transition-all disabled:cursor-not-allowed disabled:opacity-60 hover:shadow-xl hover:shadow-emerald-500/60"
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400"
@@ -2151,7 +2190,7 @@ const mobileOverviewStats = useMemo(() => ([
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={closeAttendancePopup}
-              className={`flex-1 rounded-xl border-2 border-slate-600/50 bg-slate-700/30 px-5 py-3 text-sm font-bold text-slate-300 transition-all hover:border-slate-500 hover:bg-slate-700/50 hover:text-white`}
+              className={`min-h-11 flex-1 rounded-xl border-2 border-slate-600/50 bg-slate-700/30 px-5 py-3 text-sm font-bold text-slate-300 transition-all hover:border-slate-500 hover:bg-slate-700/50 hover:text-white`}
             >
               Close
             </motion.button>

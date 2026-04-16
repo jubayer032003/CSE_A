@@ -52,6 +52,11 @@ const getReferenceCampusForSession = () => METROPOLITAN_UNIVERSITY_CAMPUS;
 const hashChallengeToken = (value) =>
   crypto.createHash("sha256").update(String(value || "")).digest("hex");
 
+const hashDeviceFingerprint = (value) =>
+  value
+    ? crypto.createHash("sha256").update(String(value)).digest("hex")
+    : "";
+
 const getClientIpAddress = (req) => {
   const possibleIpValues = [
     req.headers["cf-connecting-ip"],
@@ -204,6 +209,7 @@ const sanitizeDeviceInfo = (deviceInfo) => ({
   secureContext: Boolean(deviceInfo?.secureContext),
   platform: String(deviceInfo?.platform || "").trim().slice(0, 120),
   userAgent: String(deviceInfo?.userAgent || "").trim().slice(0, 400),
+  fingerprint: String(deviceInfo?.fingerprint || "").trim().slice(0, 1000),
 });
 
 const normalizeLiveSample = (sample, campus) => {
@@ -323,6 +329,9 @@ const evaluateLiveVerification = (samples, campus, challenge, deviceInfo) => {
     };
   }
 
+  const safeAccuracies = normalizedSamples
+    .map(({ location }) => location.accuracy)
+    .filter((value) => typeof value === "number" && !Number.isNaN(value));
   const coordinateFingerprint = new Set(
     normalizedSamples.map(
       ({ location }) =>
@@ -330,10 +339,11 @@ const evaluateLiveVerification = (samples, campus, challenge, deviceInfo) => {
     ),
   );
   const identicalSampleCoordinates = coordinateFingerprint.size <= 1;
-  if (identicalSampleCoordinates) {
+  const hasNoUsefulAccuracy = safeAccuracies.length === 0;
+  if (identicalSampleCoordinates && hasNoUsefulAccuracy) {
     return {
       ok: false,
-      message: "Attendance cancelled because the live GPS feed looked artificially fixed.",
+      message: "Attendance cancelled because the live GPS proof did not include enough accuracy evidence.",
     };
   }
 
@@ -369,9 +379,6 @@ const evaluateLiveVerification = (samples, campus, challenge, deviceInfo) => {
     };
   }
 
-  const safeAccuracies = normalizedSamples
-    .map(({ location }) => location.accuracy)
-    .filter((value) => typeof value === "number" && !Number.isNaN(value));
   const distances = normalizedSamples
     .map(({ location }) => location.distanceFromCampusMeters)
     .filter((value) => typeof value === "number" && !Number.isNaN(value));
@@ -393,7 +400,8 @@ const evaluateLiveVerification = (samples, campus, challenge, deviceInfo) => {
     !deviceInfo.pageVisible ||
     !deviceInfo.pageFocused ||
     (deviceInfo.permissionState && deviceInfo.permissionState !== "granted") ||
-    averageAccuracyMeters === null;
+    averageAccuracyMeters === null ||
+    identicalSampleCoordinates;
 
   return {
     ok: true,
@@ -494,6 +502,8 @@ const buildAttendanceResponse = (session, userId = "", options = {}) => {
       const enrichedLocation = enrichLocationWithCampusDistance(entry.location, referenceCampus);
       const unusualLocation = Boolean(enrichedLocation?.unusualDistanceDetected);
       const riskyIp = Boolean(entry.ipRisk?.proxy || entry.ipRisk?.hosting);
+      const duplicateDevice = Boolean(entry.deviceRisk?.duplicateDevice);
+      const sharedIp = Boolean(entry.deviceRisk?.sharedIp);
       const weakVerification = Boolean(entry.verification?.weakSignalDetected);
       return {
         student: entry.student,
@@ -503,12 +513,24 @@ const buildAttendanceResponse = (session, userId = "", options = {}) => {
         ipAddress: entry.ipAddress || "Not recorded",
         location: enrichedLocation,
         ipRisk: entry.ipRisk || null,
+        deviceRisk: entry.deviceRisk
+          ? {
+              duplicateDevice: Boolean(entry.deviceRisk.duplicateDevice),
+              duplicateWithStudentName: entry.deviceRisk.duplicateWithStudentName || "",
+              duplicateWithStudentId: entry.deviceRisk.duplicateWithStudentId || "",
+              sharedIp: Boolean(entry.deviceRisk.sharedIp),
+              sharedIpWithStudentName: entry.deviceRisk.sharedIpWithStudentName || "",
+              sharedIpWithStudentId: entry.deviceRisk.sharedIpWithStudentId || "",
+            }
+          : null,
         verification: entry.verification || null,
         flags: {
           unusualLocation,
           riskyIp,
+          duplicateDevice,
+          sharedIp,
           weakVerification,
-          suspicious: unusualLocation || riskyIp || weakVerification,
+          suspicious: unusualLocation || riskyIp || duplicateDevice || weakVerification,
         },
       };
     }),
@@ -905,6 +927,14 @@ const submitAttendance = async (req, res) => {
 
     const submittedLocation = verificationResult.finalLocation;
     const ipAddress = getClientIpAddress(req);
+    const deviceFingerprintHash = hashDeviceFingerprint(safeDeviceInfo.fingerprint);
+    const duplicateDeviceSubmission = deviceFingerprintHash
+      ? session.submissions.find(
+          (entry) =>
+            entry.deviceRisk?.fingerprintHash === deviceFingerprintHash &&
+            String(entry.student) !== String(req.user._id),
+        )
+      : null;
     const sameIpSubmission =
       ipAddress !== "Unknown"
         ? session.submissions.find(
@@ -916,10 +946,10 @@ const submitAttendance = async (req, res) => {
           )
         : null;
 
-    if (sameIpSubmission) {
+    if (duplicateDeviceSubmission) {
       return res.status(400).json({
         message:
-          "Attendance cancelled. This IP address was already used for another student. Please switch to your own network and submit attendance again.",
+          `Attendance cancelled. This device already submitted attendance for ${duplicateDeviceSubmission.studentName || "another student"}. Use your own device or ask the teacher to review it.`,
       });
     }
 
@@ -945,6 +975,15 @@ const submitAttendance = async (req, res) => {
         org: ipRisk.org,
         as: ipRisk.as,
         checkedAt: ipRisk.skipped ? null : new Date(),
+      },
+      deviceRisk: {
+        fingerprintHash: deviceFingerprintHash,
+        duplicateDevice: false,
+        duplicateWithStudentName: "",
+        duplicateWithStudentId: "",
+        sharedIp: Boolean(sameIpSubmission),
+        sharedIpWithStudentName: sameIpSubmission?.studentName || "",
+        sharedIpWithStudentId: sameIpSubmission?.studentId || "",
       },
       verification: verificationResult.verification,
       submittedAt: new Date(),

@@ -552,8 +552,8 @@ const CRDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {attendancePopupSession ? (
-        <div className="fixed inset-0 z-[70] flex items-end justify-center overflow-y-auto bg-black/65 px-3 py-3 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6">
-          <div className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.5rem] border border-emerald-300/25 bg-slate-950 shadow-2xl shadow-emerald-950/30 sm:max-h-[calc(100dvh-3rem)] sm:rounded-lg">
+        <div className="fixed inset-0 z-[70] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-black/65 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6">
+          <div className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-t-[1.5rem] rounded-b-lg border border-emerald-300/25 bg-slate-950 shadow-2xl shadow-emerald-950/30 sm:max-h-[calc(100dvh-3rem)] sm:rounded-lg">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-300 via-cyan-300 to-sky-300" />
             <button
               type="button"
@@ -602,12 +602,12 @@ const CRDashboard = () => {
                 </div>
               ) : null}
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <div className="sticky bottom-0 -mx-6 mt-6 flex flex-col gap-3 border-t border-white/10 bg-slate-950/90 px-6 pb-1 pt-4 backdrop-blur-xl sm:static sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:p-0">
                 <button
                   type="button"
                   onClick={() => handleAttendanceSubmit(attendancePopupSession._id)}
                   disabled={attendanceSubmittingId === attendancePopupSession._id}
-                  className="inline-flex flex-1 items-center justify-center rounded-lg bg-gradient-to-r from-emerald-300 to-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:from-emerald-200 hover:to-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg bg-gradient-to-r from-emerald-300 to-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:from-emerald-200 hover:to-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {attendanceSubmittingId === attendancePopupSession._id
                     ? "Submitting..."
@@ -616,7 +616,7 @@ const CRDashboard = () => {
                 <button
                   type="button"
                   onClick={closeAttendancePopup}
-                  className="inline-flex flex-1 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                 >
                   Close
                 </button>
@@ -1385,7 +1385,7 @@ const CRDashboard = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:items-center sm:p-4"
+            className="fixed inset-0 z-50 flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-black/70 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm sm:items-center sm:p-4"
             onClick={() => setNoticeModal(false)}
           >
             <Motion.div
@@ -1393,7 +1393,7 @@ const CRDashboard = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-purple-900 to-indigo-900 p-5 shadow-2xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl sm:p-8"
+              className="w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-t-[1.75rem] rounded-b-2xl border border-white/10 bg-gradient-to-br from-purple-900 to-indigo-900 p-5 shadow-2xl sm:max-h-[calc(100dvh-3rem)] sm:rounded-2xl sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-2xl font-bold text-white mb-6">Add New Notice</h3>
@@ -1425,12 +1425,12 @@ const CRDashboard = () => {
                 rows="5"
               />
               
-              <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+              <div className="sticky bottom-0 -mx-5 mt-2 flex flex-col-reverse justify-end gap-3 border-t border-white/10 bg-indigo-950/85 px-5 pb-1 pt-4 backdrop-blur-xl sm:static sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:p-0">
                 <Motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setNoticeModal(false)}
-                  className="w-full rounded-xl bg-white/10 px-4 py-2 text-white transition-all duration-300 hover:bg-white/20 sm:w-auto"
+                  className="min-h-11 w-full rounded-xl bg-white/10 px-4 py-2 text-white transition-all duration-300 hover:bg-white/20 sm:w-auto"
                 >
                   Cancel
                 </Motion.button>
@@ -1438,7 +1438,7 @@ const CRDashboard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={addNotice}
-                  className="w-full rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2 font-medium text-white transition-all duration-300 shadow-lg shadow-green-600/30 hover:from-green-700 hover:to-emerald-700 sm:w-auto"
+                  className="min-h-11 w-full rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2 font-medium text-white transition-all duration-300 shadow-lg shadow-green-600/30 hover:from-green-700 hover:to-emerald-700 sm:w-auto"
                 >
                   Add Notice
                 </Motion.button>

@@ -29,6 +29,15 @@ const attendanceSubmissionSchema = new mongoose.Schema(
       as: { type: String, default: "" },
       checkedAt: { type: Date, default: null },
     },
+    deviceRisk: {
+      fingerprintHash: { type: String, default: "", trim: true },
+      duplicateDevice: { type: Boolean, default: false },
+      duplicateWithStudentName: { type: String, default: "", trim: true },
+      duplicateWithStudentId: { type: String, default: "", trim: true },
+      sharedIp: { type: Boolean, default: false },
+      sharedIpWithStudentName: { type: String, default: "", trim: true },
+      sharedIpWithStudentId: { type: String, default: "", trim: true },
+    },
     verification: {
       challengeIssuedAt: { type: Date, default: null },
       verifiedAt: { type: Date, default: null },
