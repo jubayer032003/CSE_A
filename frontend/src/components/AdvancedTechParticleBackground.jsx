@@ -1,5 +1,5 @@
 import { useMemo, useRef, useEffect } from "react";
-import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import { motion as Motion, useAnimationFrame, useMotionValue } from "framer-motion";
 
 const AdvancedTechParticleBackground = ({
   mode = "quantum",
@@ -185,7 +185,7 @@ const AdvancedTechParticleBackground = ({
 
     if (isMatrix) {
       return (
-        <motion.div
+        <Motion.div
           key={particle.id}
           className="pointer-events-none absolute font-mono whitespace-nowrap"
           style={{
@@ -201,12 +201,12 @@ const AdvancedTechParticleBackground = ({
           transition={transition}
         >
           {particle.chars}
-        </motion.div>
+        </Motion.div>
       );
     }
 
     return (
-      <motion.div
+      <Motion.div
         key={particle.id}
         className="pointer-events-none absolute rounded-full"
         style={{
@@ -231,12 +231,12 @@ const AdvancedTechParticleBackground = ({
       className={`absolute inset-0 overflow-hidden ${className}`}
       style={{ zIndex: 0, pointerEvents: interactive ? "auto" : "none" }}
     >
-      <motion.div
+      <Motion.div
         className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--tw-gradient-stops))] from-teal-400/10 via-transparent to-transparent"
         animate={{ opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
+      <Motion.div
         className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,var(--tw-gradient-stops))] from-cyan-400/10 via-transparent to-transparent"
         animate={{ opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
@@ -263,7 +263,7 @@ const AdvancedTechParticleBackground = ({
               if (!p2) return null;
 
               return (
-                <motion.line
+                <Motion.line
                   key={`${p.id}-${connId}`}
                   x1={`${p.x}%`}
                   y1={`${p.y}%`}

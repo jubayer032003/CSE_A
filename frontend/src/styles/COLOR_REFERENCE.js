@@ -159,4 +159,4 @@ const componentMapping = {
  * - [ ] Create theme testing suite
  */
 
-module.exports = { colors, componentMapping };
+export { colors, componentMapping };
