@@ -7,7 +7,14 @@ const path = require("path");
 const User = require("./models/User");
 const { invitedTeachers } = require("./config/invitedTeachers");
 
-dotenv.config();
+const envPath = path.join(__dirname, ".env");
+const envResult = dotenv.config({ path: envPath });
+if (envResult.error) {
+  console.warn(
+    `No .env file loaded from ${envPath}. Using actual environment variables instead.`
+  );
+}
+
 connectDB();
 
 const app = express();
@@ -77,7 +84,7 @@ io.on("connection", (socket) => {
 // Serve built frontend assets
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
 
-app.get("/{*any}", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "frontend", "dist", "index.html"));
 });
 
