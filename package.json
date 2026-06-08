@@ -9,7 +9,7 @@
     "dev": "nodemon backend/server.js",
     "install-client": "cd frontend && npm install",
     "build-client": "cd frontend && npm run build",
-    "build": "npm run install-client && npm run build-client",
+    "build": "npm install --prefix backend && npm run install-client && npm run build-client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
