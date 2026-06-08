@@ -8,7 +8,15 @@ dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 const seedTeachers = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+    if (!mongoUri) {
+      console.error(
+        "Missing MongoDB connection string. Set MONGO_URI or MONGODB_URI in environment."
+      );
+      process.exit(1);
+    }
+
+    await mongoose.connect(mongoUri);
 
     for (const teacher of invitedTeachers) {
       const existingTeacher = await User.findOne({

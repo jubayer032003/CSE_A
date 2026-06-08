@@ -15,6 +15,15 @@ if (envResult.error) {
   );
 }
 
+const requiredEnvVars = ["JWT_SECRET"];
+const missingEnvs = requiredEnvVars.filter((name) => !process.env[name]);
+if (missingEnvs.length > 0) {
+  console.error(
+    `Missing required environment variables: ${missingEnvs.join(", ")}`
+  );
+  process.exit(1);
+}
+
 connectDB();
 
 const app = express();
