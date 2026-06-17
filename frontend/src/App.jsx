@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import StudentDashboard from "./pages/StudentDashboard";
 import CRDashboard from "./pages/CRDashboard";
 import NoteManager from "./pages/NoteManager";
+import TeacherDashboard from "./pages/TeacherDashboard";
 
 // ===============================
 // Protected Route Component
@@ -39,6 +40,8 @@ function App() {
             user ? (
               user.role === "cr" ? (
                 <Navigate to="/cr-dashboard" />
+              ) : user.role === "teacher" ? (
+                <Navigate to="/teacher-dashboard" />
               ) : (
                 <Navigate to="/student-dashboard" />
               )
@@ -77,6 +80,15 @@ function App() {
           element={
             <ProtectedRoute role="cr">
               <NoteManager />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/teacher-dashboard"
+          element={
+            <ProtectedRoute role="teacher">
+              <TeacherDashboard />
             </ProtectedRoute>
           }
         />
